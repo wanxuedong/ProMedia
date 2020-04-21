@@ -31,6 +31,7 @@ public:
     bool exit = false;
     int duration = 0;
     pthread_mutex_t seek_mutex;
+    int const INETRVAL_TIME = 1000 * 100;
 
 public:
 
@@ -55,6 +56,10 @@ public:
     void setVolume(int percent);
 
     void setMute(int mute);
+
+    void setPitch(float pitch);
+
+    void setSpeed(float speed);
 };
 
 

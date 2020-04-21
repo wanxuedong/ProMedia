@@ -14,46 +14,67 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="begin"
-            android:text="开始" />
+            android:text="开始"
+            android:textSize="12sp" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="pause"
-            android:text="暂停" />
+            android:text="暂停"
+            android:textSize="12sp" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="resume"
-            android:text="播放" />
+            android:text="播放"
+            android:textSize="12sp" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="stop"
-            android:text="停止" />
+            android:text="停止"
+            android:textSize="12sp" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="next"
-            android:text="切换" />
+            android:text="切换"
+            android:textSize="12sp" />
+
     </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/tv_time"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
-        android:text="00:00/00:00"
-        android:textColor="#222222" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/volume_show"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="音量大小:"
+            android:textColor="#222222" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="00:00/00:00"
+            android:textColor="#222222" />
+
+    </LinearLayout>
 
     <SeekBar
         android:id="@+id/seekbar_seek"
@@ -87,22 +108,64 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="left"
-            android:text="左声道" />
+            android:text="左声道"
+            android:textSize="12sp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="right"
-            android:text="右声道" />
+            android:text="右声道"
+            android:textSize="12sp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="center"
-            android:text="立体声" />
+            android:text="立体声"
+            android:textSize="12sp" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="speed"
+            android:text="变速不变调"
+            android:textSize="12sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="pitch"
+            android:text="变调不变速"
+            android:textSize="12sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="speedpitch"
+            android:text="变速又变调"
+            android:textSize="12sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="normalspeedpitch"
+            android:text="正常播放"
+            android:textSize="12sp" />
     </LinearLayout>
 
 </LinearLayout>

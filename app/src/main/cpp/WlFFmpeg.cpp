@@ -152,10 +152,13 @@ void WlFFmpeg::start() {
     while (playstatus != NULL && !playstatus->exit) {
 
         if (playstatus->seek) {
+            //为了保证cpu的低使用率，需要适当的休眠，单位微秒，这里设置的是100毫秒，即十分之一秒
+            av_usleep(INETRVAL_TIME);
             continue;
         }
 
-        if (audio->queue->getQueueSize() > 40) {
+        if (audio->queue->getQueueSize() > 100) {
+            av_usleep(INETRVAL_TIME);
             continue;
         }
 
@@ -175,6 +178,7 @@ void WlFFmpeg::start() {
             av_free(avPacket);
             while (playstatus != NULL && !playstatus->exit) {
                 if (audio->queue->getQueueSize() > 0) {
+                    av_usleep(INETRVAL_TIME);
                     continue;
                 } else {
                     playstatus->exit = true;
@@ -284,16 +288,29 @@ void WlFFmpeg::seek(int64_t secds) {
 }
 
 void WlFFmpeg::setVolume(int percent) {
-    if(audio != NULL)
-    {
+    if (audio != NULL) {
         audio->setVolume(percent);
     }
 }
 
-
 void WlFFmpeg::setMute(int mute) {
-    if(audio != NULL)
-    {
+    if (audio != NULL) {
         audio->setMute(mute);
     }
+}
+
+void WlFFmpeg::setPitch(float pitch) {
+
+    if (audio != NULL) {
+        audio->setPitch(pitch);
+    }
+
+}
+
+void WlFFmpeg::setSpeed(float speed) {
+
+    if (audio != NULL) {
+        audio->setSpeed(speed);
+    }
+
 }

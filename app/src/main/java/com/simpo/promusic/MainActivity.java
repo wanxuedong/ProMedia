@@ -18,6 +18,7 @@ import com.simpo.promusic.music.listener.WlOnLoadListener;
 import com.simpo.promusic.music.listener.WlOnPreparedListener;
 import com.simpo.promusic.music.listener.WlOnPauseResumeListener;
 import com.simpo.promusic.music.listener.WlOnTimeInfoListener;
+import com.simpo.promusic.music.listener.WlOnValumeDBListener;
 import com.simpo.promusic.music.log.MyLog;
 import com.simpo.promusic.music.player.MusicPlayer;
 import com.simpo.promusic.utils.WlTimeUtil;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private MusicPlayer wlPlayer;
     private TextView tvTime;
     private TextView tvVolume;
+    private TextView volumeShow;
     private SeekBar seekBarSeek;
     private SeekBar seekBarVolume;
     private int position = 0;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         tvVolume = findViewById(R.id.tv_volume);
         seekBarSeek = findViewById(R.id.seekbar_seek);
         seekBarVolume = findViewById(R.id.seekbar_volume);
+        volumeShow = findViewById(R.id.volume_show);
         wlPlayer = new MusicPlayer();
         wlPlayer.setVolume(50);
         tvVolume.setText("音量：" + wlPlayer.getVolumePercent() + "%");
@@ -98,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete() {
                 MyLog.d("播放完成了");
+            }
+        });
+
+        wlPlayer.setWlOnValumeDBListener(new WlOnValumeDBListener() {
+            @Override
+            public void onDbValue(int db) {
+                volumeShow.setText("音量大小:" + db);
             }
         });
         seekBarSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -178,6 +188,26 @@ public class MainActivity extends AppCompatActivity {
 
     public void center(View view) {
         wlPlayer.setMute(MuteEnum.MUTE_CENTER);
+    }
+
+    public void speed(View view) {
+        wlPlayer.setSpeed(1.5f);
+        wlPlayer.setPitch(1.0f);
+    }
+
+    public void pitch(View view) {
+        wlPlayer.setPitch(1.5f);
+        wlPlayer.setSpeed(1.0f);
+    }
+
+    public void speedpitch(View view) {
+        wlPlayer.setSpeed(1.5f);
+        wlPlayer.setPitch(1.5f);
+    }
+
+    public void normalspeedpitch(View view) {
+        wlPlayer.setSpeed(1.0f);
+        wlPlayer.setPitch(1.0f);
     }
 
     Handler handler = new Handler() {

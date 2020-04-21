@@ -10,13 +10,17 @@
 #include <linux/stddef.h>
 #include "WlQueue.h"
 #include "WlCallJava.h"
+#include "SoundTouch.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include <libswresample/swresample.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
+#include <libavutil/time.h>
 };
+
+using namespace soundtouch;
 
 class WlAudio {
 
@@ -43,8 +47,13 @@ public:
     double now_time;//当前frame时间
     double last_time; //上一次调用时间
 
+    //声音大小控制
     int volumePercent = 100;
+    //声道控制
     int mute = 2;
+
+    float pitch = 1.0f;
+    float speed = 1.0f;
 
     // 引擎接口
     SLObjectItf engineObject = NULL;
@@ -64,6 +73,16 @@ public:
     //缓冲器队列接口
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
+    //SoundTouch
+    SoundTouch *soundTouch = NULL;
+    SAMPLETYPE *sampleBuffer = NULL;
+    bool finished = true;
+    uint8_t *out_buffer = NULL;
+    int nb = 0;
+    int num = 0;
+
+    int const INETRVAL_TIME = 1000 * 100;
+
 public:
 
     WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava);
@@ -72,7 +91,7 @@ public:
 
     void play();
 
-    int resampleAudio();
+    int resampleAudio(void **pcmbuf);
 
     void initOpenSLES();
 
@@ -89,6 +108,14 @@ public:
     void setVolume(int percent);
 
     void setMute(int mute);
+
+    int getSoundTouchData();
+
+    void setPitch(float pitch);
+
+    void setSpeed(float speed);
+
+    int getPcmDb(char *pcmcata, size_t pcmsize);
 
 };
 

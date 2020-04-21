@@ -10,6 +10,7 @@ import com.simpo.promusic.music.listener.WlOnLoadListener;
 import com.simpo.promusic.music.listener.WlOnPreparedListener;
 import com.simpo.promusic.music.listener.WlOnPauseResumeListener;
 import com.simpo.promusic.music.listener.WlOnTimeInfoListener;
+import com.simpo.promusic.music.listener.WlOnValumeDBListener;
 import com.simpo.promusic.music.log.MyLog;
 import com.simpo.promusic.music.threadXUtil.AbstractLife;
 import com.simpo.promusic.music.threadXUtil.ThreadX;
@@ -50,6 +51,14 @@ public class MusicPlayer {
      * 声道模式，左，右，立体声道，默认立体
      **/
     private static MuteEnum muteEnum = MuteEnum.MUTE_CENTER;
+    /**
+     * 播放速度，正常为1
+     **/
+    private static float speed = 1.0f;
+    /**
+     * 播放音调，正常为1
+     **/
+    private static float pitch = 1.0f;
 
     private WlOnPreparedListener wlOnPreparedListener;
     private WlOnLoadListener wlOnLoadListener;
@@ -57,6 +66,7 @@ public class MusicPlayer {
     private WlOnTimeInfoListener wlOnTimeInfoListener;
     private WlOnCompleteListener wlOnCompleteListener;
     private WlOnErrorListener wlOnErrorListener;
+    private WlOnValumeDBListener wlOnValumeDBListener;
 
     /**
      * 设置音频数据源
@@ -90,6 +100,10 @@ public class MusicPlayer {
 
     public void setWlOnErrorListener(WlOnErrorListener wlOnErrorListener) {
         this.wlOnErrorListener = wlOnErrorListener;
+    }
+
+    public void setWlOnValumeDBListener(WlOnValumeDBListener wlOnValumeDBListener) {
+        this.wlOnValumeDBListener = wlOnValumeDBListener;
     }
 
     /**
@@ -151,6 +165,15 @@ public class MusicPlayer {
         if (wlOnErrorListener != null) {
             stop();
             wlOnErrorListener.onError(code, msg);
+        }
+    }
+
+    /**
+     * 声音大小回调
+     **/
+    public void onCallValumeDB(int db) {
+        if (wlOnValumeDBListener != null) {
+            wlOnValumeDBListener.onDbValue(db);
         }
     }
 
@@ -279,6 +302,22 @@ public class MusicPlayer {
         n_mute(mute.getValue());
     }
 
+    /**
+     * 设置声调,1为正常
+     **/
+    public void setPitch(float p) {
+        pitch = p;
+        n_pitch(pitch);
+    }
+
+    /**
+     * 设置播放速度，1为征程
+     **/
+    public void setSpeed(float s) {
+        speed = s;
+        n_speed(speed);
+    }
+
 
     private native void n_prepared(String source);
 
@@ -297,5 +336,9 @@ public class MusicPlayer {
     private native void n_volume(int percent);
 
     private native void n_mute(int mute);
+
+    private native void n_pitch(float pitch);
+
+    private native void n_speed(float speed);
 
 }

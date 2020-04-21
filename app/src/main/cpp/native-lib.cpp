@@ -129,3 +129,21 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1mute(JNIEnv *env, jobject th
         fFmpeg->setMute(mute);
     }
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simpo_promusic_music_player_MusicPlayer_n_1pitch(JNIEnv *env, jobject thiz, jfloat pitch) {
+    if(fFmpeg != NULL)
+    {
+        fFmpeg->setPitch(pitch);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simpo_promusic_music_player_MusicPlayer_n_1speed(JNIEnv *env, jobject thiz, jfloat speed) {
+    if(fFmpeg != NULL)
+    {
+        fFmpeg->setSpeed(speed);
+    }
+}

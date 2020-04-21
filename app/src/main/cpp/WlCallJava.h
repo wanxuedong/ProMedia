@@ -26,6 +26,7 @@ public:
     jmethodID jmid_timeinfo;
     jmethodID jmid_error;
     jmethodID jmid_complete;
+    jmethodID jmid_valumedb;
 
 public:
 
@@ -42,6 +43,8 @@ public:
     void onCallComplete(int type);
 
     void onCallError(int type, int code, char *msg);
+
+    void onCallVolumeDB(int type, int db);
 
 };
 

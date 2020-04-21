@@ -6,6 +6,13 @@ WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava
     this->sample_rate = sample_rate;
     queue = new WlQueue(playstatus);
     buffer = (uint8_t *) av_malloc(sample_rate * 2 * 2);
+
+    sampleBuffer = static_cast<SAMPLETYPE *>(malloc(sample_rate * 2 * 2));
+    soundTouch = new SoundTouch();
+    soundTouch->setSampleRate(sample_rate);
+    soundTouch->setChannels(2);
+    soundTouch->setPitch(pitch);
+    soundTouch->setTempo(speed);
 }
 
 WlAudio::~WlAudio() {
@@ -26,17 +33,21 @@ void WlAudio::play() {
 
 }
 
-int WlAudio::resampleAudio() {
-
+/**
+ * 从队列中取出音频的数据
+ * **/
+int WlAudio::resampleAudio(void **pcmbuf) {
     data_size = 0;
     while (playstatus != NULL && !playstatus->exit) {
 
         if (playstatus->seek) {
+            av_usleep(INETRVAL_TIME);
             continue;
         }
 
         if (queue->getQueueSize() == 0)//加载中
         {
+            av_usleep(INETRVAL_TIME);
             if (!playstatus->load) {
                 playstatus->load = true;
                 callJava->onCallLoad(CHILD_THREAD, true);
@@ -49,6 +60,7 @@ int WlAudio::resampleAudio() {
             }
         }
         avPacket = av_packet_alloc();
+        //queue->getAvPacket可能会休眠，所以无需再次调用av_usleep(INETRVAL_TIME)降低速率
         if (queue->getAvPacket(avPacket) != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
@@ -72,8 +84,8 @@ int WlAudio::resampleAudio() {
                 avFrame->channels = av_get_channel_layout_nb_channels(avFrame->channel_layout);
             }
 
+            //初始化重采样配置
             SwrContext *swr_ctx;
-
             swr_ctx = swr_alloc_set_opts(
                     NULL,
                     AV_CH_LAYOUT_STEREO,
@@ -95,23 +107,26 @@ int WlAudio::resampleAudio() {
                 continue;
             }
 
-            int nb = swr_convert(
+            //重采样获取采样个数
+            nb = swr_convert(
                     swr_ctx,
                     &buffer,
                     avFrame->nb_samples,
                     (const uint8_t **) avFrame->data,
                     avFrame->nb_samples);
 
+            //根据通道布局(ffmpeg中表示通道个数的封装概念)获取通道数
             int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+            //计算数据大小   =   采样个数 * 通道数 * 采样位数
             data_size = nb * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
 
-            //当前显示帧的时间，乘以转换后的时间基，就可以得到当前的播放时间
+            //从帧中获取当前的时间并乘以time_base，即可获取当前的播放时间
             now_time = avFrame->pts * av_q2d(time_base);
             if (now_time < clock) {
                 now_time = clock;
             }
             clock = now_time;
-
+            *pcmbuf = buffer;
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
@@ -136,17 +151,23 @@ int WlAudio::resampleAudio() {
 void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
     WlAudio *wlAudio = (WlAudio *) context;
     if (wlAudio != NULL) {
-        int buffersize = wlAudio->resampleAudio();
-        if (buffersize > 0) {
+        //需要注意的是这里使用的是利用soundTouch处理过的数据，
+        // 如果不需要特殊处理，也可以直接调用resampleAudio，当然下面pcmBufferQueue->Enqueue使用的buffer和大小也需要相应调整
+        int bufferSize = wlAudio->getSoundTouchData();
+        if (bufferSize > 0) {
             //起始获取的播放时间不断加上准备播放的时间，等于当前的播放时间
-            wlAudio->clock += buffersize / ((double) (wlAudio->sample_rate * 2 * 2));
+            wlAudio->clock += bufferSize / ((double) (wlAudio->sample_rate * 2 * 2));
             if (wlAudio->clock - wlAudio->last_time >= 0.1) {
                 wlAudio->last_time = wlAudio->clock;
                 //回调应用层
                 wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
             }
-            (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer,
-                                                buffersize);
+            wlAudio->callJava->onCallVolumeDB(CHILD_THREAD, wlAudio->getPcmDb(
+                    reinterpret_cast<char *>(wlAudio->sampleBuffer), bufferSize * 4));
+            //开始执行播放逻辑，传入数据和数据大小
+            (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue,
+                                                (char *) wlAudio->sampleBuffer,
+                                                bufferSize * 2 * 2);
         }
     }
 }
@@ -193,7 +214,7 @@ void WlAudio::initOpenSLES() {
 
 
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
-    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
     (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &slDataSource, &audioSnk, 3,
                                        ids, req);
@@ -294,6 +315,8 @@ void WlAudio::release() {
         pcmPlayerObject = NULL;
         pcmPlayerPlay = NULL;
         pcmBufferQueue = NULL;
+        pcmVolumePlay = NULL;
+        pcmMutePlay = NULL;
     }
 
     if (outputMixObject != NULL) {
@@ -311,6 +334,20 @@ void WlAudio::release() {
     if (buffer != NULL) {
         free(buffer);
         buffer = NULL;
+    }
+
+    if (out_buffer != NULL) {
+        out_buffer = NULL;
+    }
+
+    if (soundTouch != NULL) {
+        delete soundTouch;
+        soundTouch = NULL;
+    }
+
+    if (sampleBuffer != NULL) {
+        free(sampleBuffer);
+        sampleBuffer = NULL;
     }
 
     if (avCodecContext != NULL) {
@@ -371,7 +408,9 @@ void WlAudio::setVolume(int percent) {
     }
 }
 
-
+/**
+ * 设置播放声道模式
+ * **/
 void WlAudio::setMute(int mute) {
     this->mute = mute;
     if (pcmMutePlay != NULL) {
@@ -389,5 +428,83 @@ void WlAudio::setMute(int mute) {
             (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 0, false);
         }
     }
+}
 
+/**
+ * 获取经过soundTouch处理后的数据大小
+ * **/
+int WlAudio::getSoundTouchData() {
+
+    while (playstatus != NULL && !playstatus->exit) {
+        out_buffer = NULL;
+        if (finished) {
+            finished = false;
+            data_size = resampleAudio(reinterpret_cast<void **>(&out_buffer));
+            if (data_size > 0) {
+                //需要注意的是FFmpeg解码后的数据采样位数是8bit，soundTouch中最低采样位数是16bit，所以需要进行转换
+                for (int i = 0; i < data_size / 2 + 1; i++) {
+                    sampleBuffer[i] = (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
+                }
+                //添加数据到soundTouch
+                soundTouch->putSamples(sampleBuffer, nb);
+                //获取处理后的数据大小，这里4为 = 通道数(2) * 采样位数(16bit)
+                num = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
+            } else {
+                soundTouch->flush();
+            }
+        }
+        if (num == 0) {
+            finished = true;
+            continue;
+        } else {
+            if (out_buffer == NULL) {
+                //获取处理后的数据大小，这里4为 = 通道数(2) * 采样位数(16bit)
+                num = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
+                if (num == 0) {
+                    finished = true;
+                    continue;
+                }
+            }
+            return num;
+        }
+    }
+    return 0;
+}
+
+/**
+ * 设置音调，正常为1
+ * **/
+void WlAudio::setPitch(float pitch) {
+    this->pitch = pitch;
+    if (soundTouch != NULL) {
+        soundTouch->setPitch(pitch);
+    }
+}
+
+/**
+ * 设置播放速度，正常为1
+ * **/
+void WlAudio::setSpeed(float speed) {
+    this->speed = speed;
+    if (soundTouch != NULL) {
+        soundTouch->setTempo(speed);
+    }
+}
+
+/**
+ * 通过解析每一帧的采样位数，取其平均值，再通过公式，获取即时的播放声音大小
+ * **/
+int WlAudio::getPcmDb(char *pcmcata, size_t pcmsize) {
+    int db = 0;
+    short int pervalue = 0;
+    double sum = 0;
+    for (int i = 0; i < pcmsize; i += 2) {
+        memcpy(&pervalue, pcmcata + i, 2);
+        sum += abs(pervalue);
+    }
+    sum = sum / (pcmsize / 2);
+    if (sum > 0) {
+        db = (int) 20.0 * log10(sum);
+    }
+    return db;
 }
