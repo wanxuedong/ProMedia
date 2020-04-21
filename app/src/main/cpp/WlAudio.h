@@ -43,6 +43,9 @@ public:
     double now_time;//当前frame时间
     double last_time; //上一次调用时间
 
+    int volumePercent = 100;
+    int mute = 2;
+
     // 引擎接口
     SLObjectItf engineObject = NULL;
     SLEngineItf engineEngine = NULL;
@@ -52,9 +55,11 @@ public:
     SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
     SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
-    //pcm
+    //播放，音量，声道控制
     SLObjectItf pcmPlayerObject = NULL;
     SLPlayItf pcmPlayerPlay = NULL;
+    SLVolumeItf pcmVolumePlay = NULL;
+    SLMuteSoloItf pcmMutePlay = NULL;
 
     //缓冲器队列接口
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
@@ -80,6 +85,10 @@ public:
     void stop();
 
     void release();
+
+    void setVolume(int percent);
+
+    void setMute(int mute);
 
 };
 

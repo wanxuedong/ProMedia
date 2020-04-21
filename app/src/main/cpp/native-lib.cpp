@@ -34,14 +34,14 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1prepared(JNIEnv *env, jobjec
             wlCallJava = new WlCallJava(javaVm, env, &instance);
         }
         playstatus = new WlPlaystatus();
-        fFmpeg = new WlFFmpeg(playstatus,wlCallJava, source);
+        fFmpeg = new WlFFmpeg(playstatus, wlCallJava, source);
         fFmpeg->prepared();
     }
 
 
 }
-void *startCallBack(void *data)
-{
+
+void *startCallBack(void *data) {
     WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
     fFmpeg->start();
     pthread_exit(&thread_start);
@@ -56,54 +56,76 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1start(JNIEnv *env, jobject t
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1pause(JNIEnv *env, jobject thiz) {
-    if(fFmpeg != NULL)
-    {
+    if (fFmpeg != NULL) {
         fFmpeg->pause();
     }
 
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1resume(JNIEnv *env, jobject thiz) {
-    if(fFmpeg != NULL)
-    {
+    if (fFmpeg != NULL) {
         fFmpeg->resume();
     }
 }extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1stop(JNIEnv *env, jobject thiz) {
 
-    if(!nexit)
-    {
+    if (!nexit) {
         return;
     }
 
     jclass clz = env->GetObjectClass(thiz);
     jmethodID jmid_next = env->GetMethodID(clz, "onCallNext", "()V");
     nexit = false;
-    if(fFmpeg != NULL)
-    {
+    if (fFmpeg != NULL) {
         fFmpeg->release();
-        delete(fFmpeg);
+        delete (fFmpeg);
         fFmpeg = NULL;
-        if(wlCallJava != NULL)
-        {
-            delete(wlCallJava);
+        if (wlCallJava != NULL) {
+            delete (wlCallJava);
             wlCallJava = NULL;
         }
-        if(playstatus != NULL)
-        {
-            delete(playstatus);
+        if (playstatus != NULL) {
+            delete (playstatus);
             playstatus = NULL;
         }
     }
     nexit = true;
     env->CallVoidMethod(thiz, jmid_next);
 
-}extern "C"
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1seek(JNIEnv *env, jobject thiz, jint secds) {
+    if (fFmpeg != NULL) {
+        fFmpeg->seek(secds);
+    }
+}
+
+extern "C"
+JNIEXPORT int JNICALL
+Java_com_simpo_promusic_music_player_MusicPlayer_n_1duration(JNIEnv *env, jobject thiz) {
+    if (fFmpeg != NULL) {
+        return fFmpeg->duration;
+    }
+    return 0;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simpo_promusic_music_player_MusicPlayer_n_1volume(JNIEnv *env, jobject thiz,
+                                                           jint percent) {
+    if (fFmpeg != NULL) {
+        fFmpeg->setVolume(percent);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simpo_promusic_music_player_MusicPlayer_n_1mute(JNIEnv *env, jobject thiz, jint mute) {
     if(fFmpeg != NULL)
     {
-        fFmpeg->seek(secds);
+        fFmpeg->setMute(mute);
     }
 }

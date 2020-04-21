@@ -192,28 +192,36 @@ void WlAudio::initOpenSLES() {
     SLDataSource slDataSource = {&android_queue, &pcm};
 
 
-    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
-    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
+    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_MUTESOLO};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,SL_BOOLEAN_TRUE};
 
-    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &slDataSource, &audioSnk, 1,
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &pcmPlayerObject, &slDataSource, &audioSnk, 3,
                                        ids, req);
     //初始化播放器
     (*pcmPlayerObject)->Realize(pcmPlayerObject, SL_BOOLEAN_FALSE);
 
-//    得到接口后调用  获取Player接口
+    //得到接口后调用  获取Player接口
     (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_PLAY, &pcmPlayerPlay);
+    //得到接口后调用  获取声音控制接口
+    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_VOLUME, &pcmVolumePlay);
+    //获取声道接口
+    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_MUTESOLO, &pcmMutePlay);
 
-//    注册回调缓冲区 获取缓冲队列接口
+    //注册回调缓冲区 获取缓冲队列接口
     (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
+    //设置默认音量
+    setVolume(volumePercent);
     //缓冲接口回调
     (*pcmBufferQueue)->RegisterCallback(pcmBufferQueue, pcmBufferCallBack, this);
-//    获取播放状态接口
+    //获取播放状态接口
     (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PLAYING);
     pcmBufferCallBack(pcmBufferQueue, this);
 
-
 }
 
+/**
+ * 将具体的采样率转化成SLES中的标示
+ * **/
 int WlAudio::getCurrentSampleRateForOpensles(int sample_rate) {
     int rate = 0;
     switch (sample_rate) {
@@ -326,3 +334,60 @@ void WlAudio::stop() {
     }
 }
 
+/**
+ * 为了保证声音能够均匀的控制放大见效，需要进行分段处理
+ * **/
+void WlAudio::setVolume(int percent) {
+    if (percent < 0) {
+        volumePercent = 0;
+    } else if (percent > 100) {
+        volumePercent = 100;
+    } else {
+        volumePercent = percent;
+    }
+    /**
+     * pcmVolumePlay中的音量最大为0，最小为-5000，这里做分段处理
+     * **/
+    if (pcmVolumePlay != NULL) {
+        if (percent > 30) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -20);
+        } else if (percent > 25) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -22);
+        } else if (percent > 20) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -25);
+        } else if (percent > 15) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -28);
+        } else if (percent > 10) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -30);
+        } else if (percent > 5) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -34);
+        } else if (percent > 3) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -37);
+        } else if (percent > 0) {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -40);
+        } else {
+            (*pcmVolumePlay)->SetVolumeLevel(pcmVolumePlay, (100 - percent) * -100);
+        }
+    }
+}
+
+
+void WlAudio::setMute(int mute) {
+    this->mute = mute;
+    if (pcmMutePlay != NULL) {
+        if (mute == 0)//right
+        {
+            (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 1, false);
+            (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 0, true);
+        } else if (mute == 1)//left
+        {
+            (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 1, true);
+            (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 0, false);
+        } else if (mute == 2)//center
+        {
+            (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 1, false);
+            (*pcmMutePlay)->SetChannelMute(pcmMutePlay, 0, false);
+        }
+    }
+
+}

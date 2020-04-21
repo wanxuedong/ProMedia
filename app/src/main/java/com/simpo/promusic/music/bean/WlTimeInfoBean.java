@@ -6,7 +6,13 @@ package com.simpo.promusic.music.bean;
  **/
 public class WlTimeInfoBean {
 
+    /**
+     * 当前播放的时间，单位秒
+     **/
     private int currentTime;
+    /**
+     * 音频的总时长，单位秒
+     **/
     private int totalTime;
 
     public int getCurrentTime() {

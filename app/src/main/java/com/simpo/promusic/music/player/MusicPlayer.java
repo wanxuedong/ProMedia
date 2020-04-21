@@ -2,6 +2,7 @@ package com.simpo.promusic.music.player;
 
 import android.text.TextUtils;
 
+import com.simpo.promusic.music.bean.MuteEnum;
 import com.simpo.promusic.music.bean.WlTimeInfoBean;
 import com.simpo.promusic.music.listener.WlOnCompleteListener;
 import com.simpo.promusic.music.listener.WlOnErrorListener;
@@ -40,6 +41,16 @@ public class MusicPlayer {
     private String source;
     private WlTimeInfoBean wlTimeInfoBean;
     private boolean playNext = false;
+    private static int duration = -1;
+    /**
+     * 音量大小，0-100
+     **/
+    private static int volumePercent = 100;
+    /**
+     * 声道模式，左，右，立体声道，默认立体
+     **/
+    private static MuteEnum muteEnum = MuteEnum.MUTE_CENTER;
+
     private WlOnPreparedListener wlOnPreparedListener;
     private WlOnLoadListener wlOnLoadListener;
     private WlOnPauseResumeListener wlOnPauseResumeListener;
@@ -224,10 +235,48 @@ public class MusicPlayer {
         });
     }
 
+    /**
+     * 设置播放下一首，并且传入下一首的url
+     **/
     public void playNext(String url) {
         source = url;
         playNext = true;
         stop();
+    }
+
+    /**
+     * 获取当前的播放时间，单位秒
+     **/
+    public int getDuration() {
+        if (duration < 0) {
+            duration = n_duration();
+        }
+        return duration;
+    }
+
+    /**
+     * 设置音量大小，0-100
+     **/
+    public void setVolume(int percent) {
+        if (percent >= 0 && percent <= 100) {
+            volumePercent = percent;
+            n_volume(percent);
+        }
+    }
+
+    /**
+     * 获取当前的音量
+     **/
+    public int getVolumePercent() {
+        return volumePercent;
+    }
+
+    /**
+     * 设置声道模式
+     **/
+    public void setMute(MuteEnum mute) {
+        muteEnum = mute;
+        n_mute(mute.getValue());
     }
 
 
@@ -242,5 +291,11 @@ public class MusicPlayer {
     private native void n_stop();
 
     private native void n_seek(int secds);
+
+    private native int n_duration();
+
+    private native void n_volume(int percent);
+
+    private native void n_mute(int mute);
 
 }
