@@ -10,6 +10,7 @@
 class WlPlaystatus {
 
 public:
+    bool start = false;
     bool exit = false;
     bool load = true;
     bool seek = false;
