@@ -32,7 +32,7 @@ public class ThreadX {
      **/
     private ThreadX() {
         threadFactory = new ThreadXFactory();
-        //创建一个最小维持10个核心线程，无上限大小限制，最长保活60s的线程池,注意不要加ThreadFactory参数，逻辑会冲突
+        //创建一个最小维持的核心线程数量，无上限大小限制，最长保活60s的线程池,注意不要加ThreadFactory参数，逻辑会冲突
         executor = new ThreadPoolExecutor(CORE_POOL_SIZE, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());

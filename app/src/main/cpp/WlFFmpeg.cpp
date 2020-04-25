@@ -55,6 +55,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         }
         wlCallJava->onCallError(CHILD_THREAD, 1001, "can not open url");
         exit = true;
+        release();
         pthread_mutex_unlock(&init_mutex);
         return;
     }
@@ -65,6 +66,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         }
         wlCallJava->onCallError(CHILD_THREAD, 1002, "can not find streams from url");
         exit = true;
+        release();
         pthread_mutex_unlock(&init_mutex);
         return;
     }
@@ -94,6 +96,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         }
         wlCallJava->onCallError(CHILD_THREAD, 1003, "can not find decoder");
         exit = true;
+        release();
         pthread_mutex_unlock(&init_mutex);
         return;
     }
@@ -105,6 +108,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         }
         wlCallJava->onCallError(CHILD_THREAD, 1004, "can not alloc new decodecctx");
         exit = true;
+        release();
         pthread_mutex_unlock(&init_mutex);
         return;
     }
@@ -115,6 +119,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         }
         wlCallJava->onCallError(CHILD_THREAD, 1005, "ccan not fill decodecctx");
         exit = true;
+        release();
         pthread_mutex_unlock(&init_mutex);
         return;
     }
@@ -125,6 +130,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         }
         wlCallJava->onCallError(CHILD_THREAD, 1006, "cant not open audio strames");
         exit = true;
+        release();
         pthread_mutex_unlock(&init_mutex);
         return;
     }
@@ -134,19 +140,22 @@ void WlFFmpeg::decodeFFmpegThread() {
             wlCallJava->onCallPrepared(CHILD_THREAD);
         } else {
             exit = true;
+            release();
         }
     }
     pthread_mutex_unlock(&init_mutex);
+    return;
 }
 
 /**
- * 开始音频的解码
+ * 开始音频的解码，主要是抓取音频的信息并存储起来
  * **/
 void WlFFmpeg::start() {
-    if (audio == NULL) {
+    if (audio == NULL || playstatus->start) {
         return;
     }
     audio->play();
+    playstatus->start = true;
 
     //循环一帧一帧读取音频的数据
     while (playstatus != NULL && !playstatus->exit) {
@@ -157,13 +166,14 @@ void WlFFmpeg::start() {
             continue;
         }
 
+        //如果队列存储的数据过多就休眠
         if (audio->queue->getQueueSize() > 100) {
             av_usleep(INETRVAL_TIME);
             continue;
         }
 
         AVPacket *avPacket = av_packet_alloc();
-        //读取流下一帧信息
+        //读取流下一帧信息，并且判断未音频才存储起来
         if (av_read_frame(pFormatCtx, avPacket) == 0) {
             //一帧一帧的获取音频的数据
             if (avPacket->stream_index == audio->streamIndex) {
@@ -171,17 +181,20 @@ void WlFFmpeg::start() {
             } else {
                 av_packet_free(&avPacket);
                 av_free(avPacket);
+                avPacket = NULL;
             }
 
         } else {
             av_packet_free(&avPacket);
             av_free(avPacket);
+            avPacket = NULL;
             while (playstatus != NULL && !playstatus->exit) {
                 if (audio->queue->getQueueSize() > 0) {
                     av_usleep(INETRVAL_TIME);
                     continue;
                 } else {
                     playstatus->exit = true;
+                    playstatus->start = false;
                     break;
                 }
             }
@@ -213,6 +226,7 @@ void WlFFmpeg::release() {
         LOGE("开始释放FFmpeg");
     }
     playstatus->exit = true;
+    playstatus->start = false;
     pthread_mutex_lock(&init_mutex);
     int sleepCount = 0;
     while (!exit) {

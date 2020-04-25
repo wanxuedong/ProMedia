@@ -7,6 +7,7 @@ WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava
     queue = new WlQueue(playstatus);
     buffer = (uint8_t *) av_malloc(sample_rate * 2 * 2);
 
+    //存储的每一帧的数据大小为采样位数 * 采样通道 *
     sampleBuffer = static_cast<SAMPLETYPE *>(malloc(sample_rate * 2 * 2));
     soundTouch = new SoundTouch();
     soundTouch->setSampleRate(sample_rate);
@@ -67,6 +68,7 @@ int WlAudio::resampleAudio(void **pcmbuf) {
             avPacket = NULL;
             continue;
         }
+        //发送avPacket数据到ffmepg，放到解码队列中
         ret = avcodec_send_packet(avCodecContext, avPacket);
         if (ret != 0) {
             av_packet_free(&avPacket);
@@ -75,9 +77,11 @@ int WlAudio::resampleAudio(void **pcmbuf) {
             continue;
         }
         avFrame = av_frame_alloc();
+        //将成功的解码队列中取出1个frame
         ret = avcodec_receive_frame(avCodecContext, avFrame);
         if (ret == 0) {
 
+            //为了防止出现意外情况，保持通道数和通道布局保持一致
             if (avFrame->channels && avFrame->channel_layout == 0) {
                 avFrame->channel_layout = av_get_default_channel_layout(avFrame->channels);
             } else if (avFrame->channels == 0 && avFrame->channel_layout > 0) {
@@ -157,7 +161,7 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
         if (bufferSize > 0) {
             //起始获取的播放时间不断加上准备播放的时间，等于当前的播放时间
             wlAudio->clock += bufferSize / ((double) (wlAudio->sample_rate * 2 * 2));
-            if (wlAudio->clock - wlAudio->last_time >= 0.1) {
+            if (wlAudio->clock - wlAudio->last_time >= 1) {
                 wlAudio->last_time = wlAudio->clock;
                 //回调应用层
                 wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
@@ -446,10 +450,15 @@ int WlAudio::getSoundTouchData() {
                 for (int i = 0; i < data_size / 2 + 1; i++) {
                     sampleBuffer[i] = (out_buffer[i * 2] | ((out_buffer[i * 2 + 1]) << 8));
                 }
-                //添加数据到soundTouch
-                soundTouch->putSamples(sampleBuffer, nb);
-                //获取处理后的数据大小，这里4为 = 通道数(2) * 采样位数(16bit)
-                num = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
+                if (sampleBuffer != NULL && nb > 0) {
+                    //添加数据到soundTouch
+                    soundTouch->putSamples(sampleBuffer, nb);
+                    //获取处理后的数据大小，这里4为 = 通道数(2) * 采样位数(16bit)，因为data_size的大小是经过处理的
+                    num = soundTouch->receiveSamples(sampleBuffer, data_size / 4);
+                } else {
+                    num = 0;
+                }
+
             } else {
                 soundTouch->flush();
             }
