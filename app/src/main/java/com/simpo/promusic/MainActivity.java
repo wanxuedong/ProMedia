@@ -3,8 +3,9 @@ package com.simpo.promusic;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -15,8 +16,8 @@ import com.simpo.promusic.music.bean.WlTimeInfoBean;
 import com.simpo.promusic.music.listener.WlOnCompleteListener;
 import com.simpo.promusic.music.listener.WlOnErrorListener;
 import com.simpo.promusic.music.listener.WlOnLoadListener;
-import com.simpo.promusic.music.listener.WlOnPreparedListener;
 import com.simpo.promusic.music.listener.WlOnPauseResumeListener;
+import com.simpo.promusic.music.listener.WlOnPreparedListener;
 import com.simpo.promusic.music.listener.WlOnTimeInfoListener;
 import com.simpo.promusic.music.listener.WlOnValumeDBListener;
 import com.simpo.promusic.music.log.MyLog;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvTime;
     private TextView tvVolume;
     private TextView volumeShow;
+    private EditText musicUrl;
+    private EditText musicSpeed;
+    private EditText musicTone;
     private SeekBar seekBarSeek;
     private SeekBar seekBarVolume;
     private int position = 0;
@@ -45,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tvTime = findViewById(R.id.tv_time);
         tvVolume = findViewById(R.id.tv_volume);
+        musicUrl = findViewById(R.id.music_url);
+        musicSpeed = findViewById(R.id.music_speed);
+        musicTone = findViewById(R.id.music_tone);
         seekBarSeek = findViewById(R.id.seekbar_seek);
         seekBarVolume = findViewById(R.id.seekbar_volume);
         volumeShow = findViewById(R.id.volume_show);
@@ -152,7 +159,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void begin(View view) {
-        wlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+        if (musicUrl.getText() != null && !TextUtils.isEmpty(musicUrl.getText().toString())) {
+            wlPlayer.setSource(musicUrl.getText().toString());
+        } else {
+            wlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+        }
         wlPlayer.prepare();
     }
 
@@ -191,23 +202,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void speed(View view) {
-        wlPlayer.setSpeed(1.5f);
-        wlPlayer.setPitch(1.0f);
+        if (musicSpeed.getText() != null && !"".equals(musicSpeed.getText().toString())) {
+            wlPlayer.setSpeed(Float.parseFloat(musicSpeed.getText().toString()) / 5);
+        } else {
+            wlPlayer.setSpeed(1.0f);
+        }
     }
 
     public void pitch(View view) {
-        wlPlayer.setPitch(1.5f);
-        wlPlayer.setSpeed(1.0f);
-    }
-
-    public void speedpitch(View view) {
-        wlPlayer.setSpeed(1.5f);
-        wlPlayer.setPitch(1.5f);
-    }
-
-    public void normalspeedpitch(View view) {
-        wlPlayer.setSpeed(1.0f);
-        wlPlayer.setPitch(1.0f);
+        if (musicSpeed.getText() != null && !"".equals(musicSpeed.getText().toString())) {
+            wlPlayer.setPitch(Float.parseFloat(musicTone.getText().toString()) / 5);
+        } else {
+            wlPlayer.setPitch(1.0f);
+        }
     }
 
     Handler handler = new Handler() {

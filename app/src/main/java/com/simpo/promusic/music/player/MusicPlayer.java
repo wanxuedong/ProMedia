@@ -142,8 +142,8 @@ public class MusicPlayer {
      * 音频播放完毕回调
      **/
     public void onCallComplete() {
+        stop();
         if (wlOnCompleteListener != null) {
-            stop();
             wlOnCompleteListener.onComplete();
         }
     }

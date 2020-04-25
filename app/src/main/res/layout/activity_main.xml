@@ -4,10 +4,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <EditText
+        android:id="@+id/music_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#fff"
+        android:hint="请输入音频url"
+        android:padding="10dp"
+        android:text="http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3"
+        android:textSize="10sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
 
         <Button
             android:layout_width="0dp"
@@ -135,37 +147,68 @@
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
-        <Button
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="speed"
-            android:text="变速不变调"
-            android:textSize="12sp" />
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="pitch"
-            android:text="变调不变速"
-            android:textSize="12sp" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="speed"
+                android:text="点击设置速度:"
+                android:textSize="12sp" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="speedpitch"
-            android:text="变速又变调"
-            android:textSize="12sp" />
+            <EditText
+                android:id="@+id/music_speed"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:gravity="center"
+                android:hint="1-10"
+                android:inputType="number"
+                android:maxLength="2"
+                android:maxLines="1"
+                android:padding="10dp"
+                android:text="5"
+                android:textSize="12sp" />
 
-        <Button
-            android:layout_width="wrap_content"
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="normalspeedpitch"
-            android:text="正常播放"
-            android:textSize="12sp" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="pitch"
+                android:text="点击设置音调:"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/music_tone"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:gravity="center"
+                android:hint="1-10"
+                android:inputType="number"
+                android:maxLength="2"
+                android:maxLines="1"
+                android:padding="10dp"
+                android:text="5"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>
