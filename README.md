@@ -1,5 +1,5 @@
 # ProMusic
-FFmpeg结合OpenSLES和OpenGLES实现对音视频的基本处理
+提供FFmpeg结合OpenSLES和OpenGLES实现对音视频的基本处理示例
 
 多种cpu架构下的ffmpeg编译库
 
