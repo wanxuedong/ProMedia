@@ -1,10 +1,12 @@
 package com.simpo.promusic;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -22,6 +24,8 @@ import com.simpo.promusic.music.listener.WlOnTimeInfoListener;
 import com.simpo.promusic.music.listener.WlOnValumeDBListener;
 import com.simpo.promusic.music.log.MyLog;
 import com.simpo.promusic.music.player.MusicPlayer;
+import com.simpo.promusic.opengl.WlGLSurfaceView;
+import com.simpo.promusic.utils.PermissionsUtils;
 import com.simpo.promusic.utils.WlTimeUtil;
 
 
@@ -41,11 +45,13 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBarVolume;
     private int position = 0;
     private boolean isSeekBar = false;
+    private WlGLSurfaceView wlGLSurfaceView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         tvTime = findViewById(R.id.tv_time);
         tvVolume = findViewById(R.id.tv_volume);
@@ -55,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
         seekBarSeek = findViewById(R.id.seekbar_seek);
         seekBarVolume = findViewById(R.id.seekbar_volume);
         volumeShow = findViewById(R.id.volume_show);
+        wlGLSurfaceView = findViewById(R.id.wlglsurfaceview);
         wlPlayer = new MusicPlayer();
+        wlPlayer.setWlGLSurfaceView(wlGLSurfaceView);
         wlPlayer.setVolume(50);
         tvVolume.setText("音量：" + wlPlayer.getVolumePercent() + "%");
         seekBarVolume.setProgress(wlPlayer.getVolumePercent());
@@ -108,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete() {
                 MyLog.d("播放完成了");
+                isPlay = false;
             }
         });
 
@@ -120,9 +129,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (wlPlayer.getDuration() > 0 && isSeekBar) {
-                    position = wlPlayer.getDuration() * progress / 100;
-                }
+                position = wlPlayer.getDuration() * progress / 100;
             }
 
             @Override
@@ -159,21 +166,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void begin(View view) {
-        if (musicUrl.getText() != null && !TextUtils.isEmpty(musicUrl.getText().toString())) {
-            wlPlayer.setSource(musicUrl.getText().toString());
-        } else {
-            wlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+        if (PermissionsUtils.getStorgePermission(this)) {
+            isPlay = true;
+//        if (musicUrl.getText() != null && !TextUtils.isEmpty(musicUrl.getText().toString())) {
+//            wlPlayer.setSource(musicUrl.getText().toString());
+//        } else {
+//            wlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
+//            wlPlayer.playNext("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319222227698228.mp4");
+//            wlPlayer.setSource("https://stream7.iqilu.com/10339/upload_transcode/202002/18/20200218114723HDu3hhxqIT.mp4");
+            wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/泰坦尼克号.mkv");
+//        }
+            wlPlayer.prepare();
         }
-        wlPlayer.prepare();
     }
 
-    public void pause(View view) {
+    private boolean hasPause = false;
+    private boolean isPlay = false;
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        hasPause = true;
         wlPlayer.pause();
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasPause && isPlay) {
+            wlPlayer.resume();
+        }
+    }
+
+    public void pause(View view) {
+        wlPlayer.pause();
+        isPlay = false;
+
+    }
+
     public void resume(View view) {
+        isPlay = true;
         wlPlayer.resume();
     }
 
@@ -186,7 +219,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void next(View view) {
-        wlPlayer.playNext("http://ngcdn004.cnr.cn/live/dszs/index.m3u8");
+//        wlPlayer.playNext("http://ngcdn004.cnr.cn/live/dszs/index.m3u8");
+        wlPlayer.playNext("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319222227698228.mp4");
     }
 
     public void left(View view) {
@@ -222,10 +256,12 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == 1) {
-                if (!isSeekBar) {
-                    WlTimeInfoBean wlTimeInfoBean = (WlTimeInfoBean) msg.obj;
-                    tvTime.setText(WlTimeUtil.secdsToDateFormat(wlTimeInfoBean.getTotalTime(), wlTimeInfoBean.getTotalTime())
-                            + "/" + WlTimeUtil.secdsToDateFormat(wlTimeInfoBean.getCurrentTime(), wlTimeInfoBean.getTotalTime()));
+                WlTimeInfoBean wlTimeInfoBean = (WlTimeInfoBean) msg.obj;
+                tvTime.setText(WlTimeUtil.secdsToDateFormat(wlTimeInfoBean.getTotalTime(), wlTimeInfoBean.getTotalTime())
+                        + "/" + WlTimeUtil.secdsToDateFormat(wlTimeInfoBean.getCurrentTime(), wlTimeInfoBean.getTotalTime()));
+
+
+                if (!isSeekBar && wlTimeInfoBean.getTotalTime() > 0) {
                     seekBarSeek.setProgress(wlTimeInfoBean.getCurrentTime() * 100 / wlTimeInfoBean.getTotalTime());
                 }
             }

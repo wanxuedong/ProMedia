@@ -44,7 +44,7 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1prepared(JNIEnv *env, jobjec
 void *startCallBack(void *data) {
     WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
     fFmpeg->start();
-    pthread_exit(&thread_start);
+    return 0;
 }
 
 extern "C"
@@ -79,6 +79,7 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1stop(JNIEnv *env, jobject th
     nexit = false;
     if (fFmpeg != NULL) {
         fFmpeg->release();
+        pthread_join(thread_start, NULL);
         delete (fFmpeg);
         fFmpeg = NULL;
         if (wlCallJava != NULL) {
@@ -104,15 +105,6 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1seek(JNIEnv *env, jobject th
 }
 
 extern "C"
-JNIEXPORT int JNICALL
-Java_com_simpo_promusic_music_player_MusicPlayer_n_1duration(JNIEnv *env, jobject thiz) {
-    if (fFmpeg != NULL) {
-        return fFmpeg->duration;
-    }
-    return 0;
-}
-
-extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1volume(JNIEnv *env, jobject thiz,
                                                            jint percent) {
@@ -124,8 +116,7 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1volume(JNIEnv *env, jobject 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1mute(JNIEnv *env, jobject thiz, jint mute) {
-    if(fFmpeg != NULL)
-    {
+    if (fFmpeg != NULL) {
         fFmpeg->setMute(mute);
     }
 }
@@ -133,8 +124,7 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1mute(JNIEnv *env, jobject th
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1pitch(JNIEnv *env, jobject thiz, jfloat pitch) {
-    if(fFmpeg != NULL)
-    {
+    if (fFmpeg != NULL) {
         fFmpeg->setPitch(pitch);
     }
 }
@@ -142,8 +132,7 @@ Java_com_simpo_promusic_music_player_MusicPlayer_n_1pitch(JNIEnv *env, jobject t
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_simpo_promusic_music_player_MusicPlayer_n_1speed(JNIEnv *env, jobject thiz, jfloat speed) {
-    if(fFmpeg != NULL)
-    {
+    if (fFmpeg != NULL) {
         fFmpeg->setSpeed(speed);
     }
 }

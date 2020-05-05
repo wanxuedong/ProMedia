@@ -27,6 +27,7 @@ add_library(
         src/main/cpp/WlCallJava.cpp
         src/main/cpp/WlFFmpeg.cpp
         src/main/cpp/WlAudio.cpp
+        src/main/cpp/WlVideo.cpp
         src/main/cpp/WlQueue.cpp
         src/main/cpp/WlPlaystatus.cpp
 

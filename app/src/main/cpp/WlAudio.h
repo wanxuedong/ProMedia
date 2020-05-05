@@ -73,6 +73,8 @@ public:
     //缓冲器队列接口
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
+    pthread_mutex_t codecMutex;
+
     //SoundTouch
     SoundTouch *soundTouch = NULL;
     SAMPLETYPE *sampleBuffer = NULL;

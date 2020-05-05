@@ -4,6 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <com.simpo.promusic.opengl.WlGLSurfaceView
+        android:id="@+id/wlglsurfaceview"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />
+
     <EditText
         android:id="@+id/music_url"
         android:layout_width="match_parent"
@@ -12,7 +17,7 @@
         android:background="#fff"
         android:hint="请输入音频url"
         android:padding="10dp"
-        android:text="http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3"
+        android:text="http://vfx.mtime.cn/Video/2019/03/19/mp4/190319222227698228.mp4"
         android:textSize="10sp" />
 
     <LinearLayout
@@ -42,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="resume"
-            android:text="播放"
+            android:text="继续"
             android:textSize="12sp" />
 
         <Button

@@ -37,6 +37,8 @@ public:
 
     int getQueueSize();
 
+    void noticeQueue();
+
 };
 
 

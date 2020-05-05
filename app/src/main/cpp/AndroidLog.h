@@ -11,5 +11,5 @@
 
 #define LOG_DEBUG true
 
-#define LOGD(FORMAT,...) __android_log_print(ANDROID_LOG_DEBUG,"wanxuedong",FORMAT,##__VA_ARGS__);
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"wanxuedong",FORMAT,##__VA_ARGS__);
+#define LOGD(FORMAT,...) __android_log_print(ANDROID_LOG_DEBUG,"pro_music",FORMAT,##__VA_ARGS__);
+#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"pro_music",FORMAT,##__VA_ARGS__);

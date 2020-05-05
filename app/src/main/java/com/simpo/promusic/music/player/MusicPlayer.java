@@ -1,19 +1,27 @@
 package com.simpo.promusic.music.player;
 
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.text.TextUtils;
+import android.view.Surface;
 
 import com.simpo.promusic.music.bean.MuteEnum;
 import com.simpo.promusic.music.bean.WlTimeInfoBean;
 import com.simpo.promusic.music.listener.WlOnCompleteListener;
 import com.simpo.promusic.music.listener.WlOnErrorListener;
 import com.simpo.promusic.music.listener.WlOnLoadListener;
-import com.simpo.promusic.music.listener.WlOnPreparedListener;
 import com.simpo.promusic.music.listener.WlOnPauseResumeListener;
+import com.simpo.promusic.music.listener.WlOnPreparedListener;
 import com.simpo.promusic.music.listener.WlOnTimeInfoListener;
 import com.simpo.promusic.music.listener.WlOnValumeDBListener;
 import com.simpo.promusic.music.log.MyLog;
 import com.simpo.promusic.music.threadXUtil.AbstractLife;
 import com.simpo.promusic.music.threadXUtil.ThreadX;
+import com.simpo.promusic.opengl.WlGLSurfaceView;
+import com.simpo.promusic.opengl.WlRender;
+import com.simpo.promusic.utils.WlVideoSupportUitl;
+
+import java.nio.ByteBuffer;
 
 /**
  * @author wanxuedong
@@ -40,6 +48,7 @@ public class MusicPlayer {
      * 数据源
      **/
     private String source;
+    private WlGLSurfaceView wlGLSurfaceView;
     private WlTimeInfoBean wlTimeInfoBean;
     private boolean playNext = false;
     private static int duration = -1;
@@ -68,11 +77,29 @@ public class MusicPlayer {
     private WlOnErrorListener wlOnErrorListener;
     private WlOnValumeDBListener wlOnValumeDBListener;
 
+    private MediaFormat mediaFormat;
+    private MediaCodec mediaCodec;
+    private Surface surface;
+    private MediaCodec.BufferInfo info;
+
     /**
      * 设置音频数据源
      **/
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public void setWlGLSurfaceView(WlGLSurfaceView wlGLSurfaceView) {
+        this.wlGLSurfaceView = wlGLSurfaceView;
+        wlGLSurfaceView.getWlRender().setOnSurfaceCreateListener(new WlRender.OnSurfaceCreateListener() {
+            @Override
+            public void onSurfaceCreate(Surface s) {
+                if (surface == null) {
+                    surface = s;
+                    MyLog.d("onSurfaceCreate");
+                }
+            }
+        });
     }
 
     /**
@@ -132,6 +159,7 @@ public class MusicPlayer {
             if (wlTimeInfoBean == null) {
                 wlTimeInfoBean = new WlTimeInfoBean();
             }
+            duration = totalTime;
             wlTimeInfoBean.setCurrentTime(currentTime);
             wlTimeInfoBean.setTotalTime(totalTime);
             wlOnTimeInfoListener.onTimeInfo(wlTimeInfoBean);
@@ -174,6 +202,94 @@ public class MusicPlayer {
     public void onCallValumeDB(int db) {
         if (wlOnValumeDBListener != null) {
             wlOnValumeDBListener.onDbValue(db);
+        }
+    }
+
+    /**
+     * 回调yuv数据
+     **/
+    public void onCallRenderYUV(int width, int height, byte[] y, byte[] u, byte[] v) {
+        if (wlGLSurfaceView != null) {
+            wlGLSurfaceView.setYUVData(width, height, y, u, v);
+        }
+    }
+
+    /**
+     * 判断是否支持当前格式的硬解码
+     **/
+    public boolean onCallIsSupportMediaCodec(String ffcodecname) {
+        return WlVideoSupportUitl.isSupportCodec(ffcodecname);
+    }
+
+    /**
+     * 初始化MediaCodec
+     *
+     * @param codecName
+     * @param width
+     * @param height
+     * @param csd_0
+     * @param csd_1
+     */
+    public void initMediaCodec(String codecName, int width, int height, byte[] csd_0, byte[] csd_1) {
+        if (surface != null) {
+            try {
+                wlGLSurfaceView.getWlRender().setRenderType(WlRender.RENDER_MEDIACODEC);
+                String mime = WlVideoSupportUitl.findVideoCodecName(codecName);
+                mediaFormat = MediaFormat.createVideoFormat(mime, width, height);
+                mediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, width * height);
+                mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(csd_0));
+                mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(csd_1));
+                MyLog.d(mediaFormat.toString());
+                mediaCodec = MediaCodec.createDecoderByType(mime);
+
+                info = new MediaCodec.BufferInfo();
+                mediaCodec.configure(mediaFormat, surface, null, 0);
+                mediaCodec.start();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            if (wlOnErrorListener != null) {
+                wlOnErrorListener.onError(2001, "surface is null");
+            }
+        }
+    }
+
+    private void releaseMediacodec() {
+        if (mediaCodec != null) {
+            mediaCodec.flush();
+            mediaCodec.stop();
+            mediaCodec.release();
+
+            mediaCodec = null;
+            mediaFormat = null;
+            info = null;
+        }
+    }
+
+    /**
+     * 回调硬解码需要的数据
+     *
+     * @param datasize 数据大小
+     * @param data     数据内容
+     */
+    public void decodeAVPacket(int datasize, byte[] data) {
+        if (surface != null && datasize > 0 && data != null && mediaCodec != null) {
+            int intPutBufferIndex = mediaCodec.dequeueInputBuffer(10);
+            if (intPutBufferIndex >= 0) {
+                ByteBuffer byteBuffer = mediaCodec.getInputBuffers()[intPutBufferIndex];
+                byteBuffer.clear();
+                byteBuffer.put(data);
+                mediaCodec.queueInputBuffer(intPutBufferIndex, 0, datasize, 0, 0);
+            }
+            int outPutBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
+            while (outPutBufferIndex >= 0) {
+                //处理完成，释放ByteBuffer数据,即将缓冲区返回到编解码器
+                mediaCodec.releaseOutputBuffer(outPutBufferIndex, true);
+                //输出缓冲区出列，最多阻塞“超时”微秒，返回输出缓冲区索引
+                outPutBufferIndex = mediaCodec.dequeueOutputBuffer(info, 10);
+            }
         }
     }
 
@@ -236,11 +352,14 @@ public class MusicPlayer {
      * 停止播放音频源并释放内存
      **/
     public void stop() {
+        wlTimeInfoBean = null;
+        duration = 0;
         ThreadX.x().run(new AbstractLife() {
             @Override
             public void run() {
                 super.run();
                 n_stop();
+                releaseMediacodec();
             }
         });
     }
@@ -271,9 +390,6 @@ public class MusicPlayer {
      * 获取当前的播放时间，单位秒
      **/
     public int getDuration() {
-        if (duration < 0) {
-            duration = n_duration();
-        }
         return duration;
     }
 
@@ -330,8 +446,6 @@ public class MusicPlayer {
     private native void n_stop();
 
     private native void n_seek(int secds);
-
-    private native int n_duration();
 
     private native void n_volume(int percent);
 

@@ -7,6 +7,8 @@ WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava
     queue = new WlQueue(playstatus);
     buffer = (uint8_t *) av_malloc(sample_rate * 2 * 2);
 
+    pthread_mutex_init(&codecMutex, NULL);
+
     //存储的每一帧的数据大小为采样位数 * 采样通道 *
     sampleBuffer = static_cast<SAMPLETYPE *>(malloc(sample_rate * 2 * 2));
     soundTouch = new SoundTouch();
@@ -17,7 +19,7 @@ WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava
 }
 
 WlAudio::~WlAudio() {
-
+    pthread_mutex_destroy(&codecMutex);
 }
 
 void *decodPlay(void *data) {
@@ -25,12 +27,14 @@ void *decodPlay(void *data) {
 
     wlAudio->initOpenSLES();
 
-    pthread_exit(&wlAudio->thread_play);
+    return 0;
 }
 
 void WlAudio::play() {
 
-    pthread_create(&thread_play, NULL, decodPlay, this);
+    if (playstatus != NULL && !playstatus->exit) {
+        pthread_create(&thread_play, NULL, decodPlay, this);
+    }
 
 }
 
@@ -53,6 +57,7 @@ int WlAudio::resampleAudio(void **pcmbuf) {
                 playstatus->load = true;
                 callJava->onCallLoad(CHILD_THREAD, true);
             }
+            av_usleep(INETRVAL_TIME);
             continue;
         } else {
             if (playstatus->load) {
@@ -68,12 +73,14 @@ int WlAudio::resampleAudio(void **pcmbuf) {
             avPacket = NULL;
             continue;
         }
+        pthread_mutex_lock(&codecMutex);
         //发送avPacket数据到ffmepg，放到解码队列中
         ret = avcodec_send_packet(avCodecContext, avPacket);
         if (ret != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
+            pthread_mutex_unlock(&codecMutex);
             continue;
         }
         avFrame = av_frame_alloc();
@@ -108,6 +115,7 @@ int WlAudio::resampleAudio(void **pcmbuf) {
                 av_free(avFrame);
                 avFrame = NULL;
                 swr_free(&swr_ctx);
+                pthread_mutex_unlock(&codecMutex);
                 continue;
             }
 
@@ -130,13 +138,16 @@ int WlAudio::resampleAudio(void **pcmbuf) {
                 now_time = clock;
             }
             clock = now_time;
-            *pcmbuf = buffer;
+            if (pcmbuf != NULL) {
+                *pcmbuf = buffer;
+            }
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
             av_frame_free(&avFrame);
             av_free(avFrame);
             avFrame = NULL;
+            pthread_mutex_unlock(&codecMutex);
             swr_free(&swr_ctx);
             break;
         } else {
@@ -146,18 +157,38 @@ int WlAudio::resampleAudio(void **pcmbuf) {
             av_frame_free(&avFrame);
             av_free(avFrame);
             avFrame = NULL;
+            pthread_mutex_unlock(&codecMutex);
             continue;
         }
     }
     return data_size;
 }
 
+/**
+ * 需要注意的是使用soundTouch处理后的声音会间隔出现噪点,正常播放视频最好不要开启
+ * **/
 void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
     WlAudio *wlAudio = (WlAudio *) context;
     if (wlAudio != NULL) {
         //需要注意的是这里使用的是利用soundTouch处理过的数据，
-        // 如果不需要特殊处理，也可以直接调用resampleAudio，当然下面pcmBufferQueue->Enqueue使用的buffer和大小也需要相应调整
-        int bufferSize = wlAudio->getSoundTouchData();
+//        int bufferSize = wlAudio->getSoundTouchData();
+//        if (bufferSize > 0) {
+//            //起始获取的播放时间不断加上准备播放的时间，等于当前的播放时间
+//            wlAudio->clock += bufferSize / ((double) (wlAudio->sample_rate * 2 * 2));
+//            if (wlAudio->clock - wlAudio->last_time >= 1) {
+//                wlAudio->last_time = wlAudio->clock;
+//                //回调应用层
+//                wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
+//            }
+//            wlAudio->callJava->onCallVolumeDB(CHILD_THREAD, wlAudio->getPcmDb(
+//                    reinterpret_cast<char *>(wlAudio->sampleBuffer), bufferSize * 4));
+//            //开始执行播放逻辑，传入数据和数据大小
+//            (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue,
+//                                                (char *) wlAudio->sampleBuffer,
+//                                                bufferSize * 2 * 2);
+//        }
+        //这里使用的是正常的音频的数据
+        int bufferSize = wlAudio->resampleAudio(NULL);
         if (bufferSize > 0) {
             //起始获取的播放时间不断加上准备播放的时间，等于当前的播放时间
             wlAudio->clock += bufferSize / ((double) (wlAudio->sample_rate * 2 * 2));
@@ -167,11 +198,10 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
                 wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
             }
             wlAudio->callJava->onCallVolumeDB(CHILD_THREAD, wlAudio->getPcmDb(
-                    reinterpret_cast<char *>(wlAudio->sampleBuffer), bufferSize * 4));
+                    reinterpret_cast<char *>(wlAudio->buffer), bufferSize * 4));
             //开始执行播放逻辑，传入数据和数据大小
-            (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue,
-                                                (char *) wlAudio->sampleBuffer,
-                                                bufferSize * 2 * 2);
+            (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer,
+                                                bufferSize);
         }
     }
 }
@@ -311,6 +341,11 @@ void WlAudio::resume() {
 void WlAudio::release() {
 
     if (queue != NULL) {
+        queue->noticeQueue();
+    }
+    pthread_join(thread_play, NULL);
+
+    if (queue != NULL) {
         delete (queue);
         queue = NULL;
     }
@@ -436,7 +471,7 @@ void WlAudio::setMute(int mute) {
 }
 
 /**
- * 获取经过soundTouch处理后的数据大小
+ * 获取经过soundTouch处理后的数据，并返回数据大小
  * **/
 int WlAudio::getSoundTouchData() {
 
