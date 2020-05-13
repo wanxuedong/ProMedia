@@ -1,10 +1,10 @@
 package com.simpo.promusic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -13,18 +13,18 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.simpo.promusic.music.bean.MuteEnum;
-import com.simpo.promusic.music.bean.WlTimeInfoBean;
-import com.simpo.promusic.music.listener.WlOnCompleteListener;
-import com.simpo.promusic.music.listener.WlOnErrorListener;
-import com.simpo.promusic.music.listener.WlOnLoadListener;
-import com.simpo.promusic.music.listener.WlOnPauseResumeListener;
-import com.simpo.promusic.music.listener.WlOnPreparedListener;
-import com.simpo.promusic.music.listener.WlOnTimeInfoListener;
-import com.simpo.promusic.music.listener.WlOnValumeDBListener;
-import com.simpo.promusic.music.log.MyLog;
-import com.simpo.promusic.music.player.MusicPlayer;
 import com.simpo.promusic.opengl.WlGLSurfaceView;
+import com.simpo.promusic.player.MusicPlayer;
+import com.simpo.promusic.player.bean.MuteEnum;
+import com.simpo.promusic.player.bean.WlTimeInfoBean;
+import com.simpo.promusic.player.listener.WlOnCompleteListener;
+import com.simpo.promusic.player.listener.WlOnErrorListener;
+import com.simpo.promusic.player.listener.WlOnLoadListener;
+import com.simpo.promusic.player.listener.WlOnPauseResumeListener;
+import com.simpo.promusic.player.listener.WlOnPreparedListener;
+import com.simpo.promusic.player.listener.WlOnTimeInfoListener;
+import com.simpo.promusic.player.listener.WlOnValumeDBListener;
+import com.simpo.promusic.player.log.MyLog;
 import com.simpo.promusic.utils.PermissionsUtils;
 import com.simpo.promusic.utils.WlTimeUtil;
 
@@ -174,7 +174,8 @@ public class MainActivity extends AppCompatActivity {
 //            wlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3");
 //            wlPlayer.playNext("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319222227698228.mp4");
 //            wlPlayer.setSource("https://stream7.iqilu.com/10339/upload_transcode/202002/18/20200218114723HDu3hhxqIT.mp4");
-            wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/泰坦尼克号.mkv");
+//            wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/泰坦尼克号.mkv");
+            wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/WDNMD.mp4");
 //        }
             wlPlayer.prepare();
         }

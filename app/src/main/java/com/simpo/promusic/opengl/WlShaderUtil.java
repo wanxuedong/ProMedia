@@ -3,7 +3,7 @@ package com.simpo.promusic.opengl;
 import android.content.Context;
 import android.opengl.GLES20;
 
-import com.simpo.promusic.music.log.MyLog;
+import com.simpo.promusic.player.log.MyLog;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -28,25 +28,6 @@ public class WlShaderUtil {
             e.printStackTrace();
         }
         return sb.toString();
-    }
-
-    /**
-     * 创建shader程序
-     **/
-    public static int loadShader(int shaderType, String source) {
-        int shader = GLES20.glCreateShader(shaderType);
-        if (shader != 0) {
-            GLES20.glShaderSource(shader, source);
-            GLES20.glCompileShader(shader);
-            int[] compile = new int[1];
-            GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
-            if (compile[0] != GLES20.GL_TRUE) {
-                MyLog.d("shader compile error");
-                GLES20.glDeleteShader(shader);
-                shader = 0;
-            }
-        }
-        return shader;
     }
 
     /**
@@ -78,6 +59,25 @@ public class WlShaderUtil {
         }
         return program;
 
+    }
+
+    /**
+     * 创建shader程序
+     **/
+    public static int loadShader(int shaderType, String source) {
+        int shader = GLES20.glCreateShader(shaderType);
+        if (shader != 0) {
+            GLES20.glShaderSource(shader, source);
+            GLES20.glCompileShader(shader);
+            int[] compile = new int[1];
+            GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
+            if (compile[0] != GLES20.GL_TRUE) {
+                MyLog.d("shader compile error");
+                GLES20.glDeleteShader(shader);
+                shader = 0;
+            }
+        }
+        return shader;
     }
 
 }

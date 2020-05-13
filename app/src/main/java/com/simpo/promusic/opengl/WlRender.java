@@ -129,8 +129,8 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
 
     private void initRenderYUV() {
         //创建并编译顶点着色器和片元着色器
-        String vertexSource = WlShaderUtil.readRawTxt(context, R.raw.vertex_shader);
-        String fragmentSource = WlShaderUtil.readRawTxt(context, R.raw.fragment_shader);
+        String vertexSource = WlShaderUtil.readRawTxt(context, R.raw.open_vertex_shader);
+        String fragmentSource = WlShaderUtil.readRawTxt(context, R.raw.open_fragment_shader);
 
         //创建shader程序链
         program_yuv = WlShaderUtil.createProgram(vertexSource, fragmentSource);
@@ -161,8 +161,8 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
 
     private void initRenderMediacodec()
     {
-        String vertexSource = WlShaderUtil.readRawTxt(context, R.raw.vertex_shader);
-        String fragmentSource = WlShaderUtil.readRawTxt(context, R.raw.fragment_mediacodec);
+        String vertexSource = WlShaderUtil.readRawTxt(context, R.raw.open_vertex_shader);
+        String fragmentSource = WlShaderUtil.readRawTxt(context, R.raw.open_fragment_mediacodec);
         program_mediacodec = WlShaderUtil.createProgram(vertexSource, fragmentSource);
 
         avPosition_mediacodec = GLES20.glGetAttribLocation(program_mediacodec, "av_Position");
