@@ -241,7 +241,7 @@ public abstract class WLEGLSurfaceView extends SurfaceView implements SurfaceHol
          **/
         public void release() {
             if (eglHelper != null) {
-                eglHelper.destoryEgl();
+                eglHelper.destroyEgl();
                 eglHelper = null;
                 object = null;
                 wleglSurfaceViewWeakReference = null;
@@ -250,7 +250,7 @@ public abstract class WLEGLSurfaceView extends SurfaceView implements SurfaceHol
 
         public EGLContext getEglContext() {
             if (eglHelper != null) {
-                return eglHelper.getmEglContext();
+                return eglHelper.getEglContext();
             }
             return null;
         }

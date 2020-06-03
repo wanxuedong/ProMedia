@@ -1,0 +1,53 @@
+<resources>
+
+    <style name="CommonDialog" parent="android:Theme.Dialog">
+        <!-- 背景颜色及透明程度 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 是否半透明 -->
+        <item name="android:windowIsTranslucent">false</item>
+        <!-- 是否没有标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 是否背景模糊 -->
+        <item name="android:backgroundDimEnabled">false</item>
+        <!-- 设置背景模糊的透明度-->
+        <item name="android:backgroundDimAmount">0.5</item>
+    </style>
+
+    <!--顶部弹出的弹框-->
+    <style name="UpToDownDialog" parent="CommonDialog">
+        <!--进入时的动画-->
+        <item name="android:windowEnterAnimation">@anim/down_to_up</item>
+        <item name="android:windowExitAnimation">@anim/up_to_down</item>
+    </style>
+
+    <!--底部弹出的弹框-->
+    <style name="DownToUpDialog" parent="CommonDialog">
+        <!--进入时的动画-->
+        <item name="android:windowEnterAnimation">@anim/up_to_down</item>
+        <item name="android:windowExitAnimation">@anim/down_to_up</item>
+    </style>
+
+    <!--中间弹出的弹框-->
+    <style name="CenterDialog" parent="CommonDialog">
+        <!--进入时的动画-->
+        <item name="android:windowEnterAnimation">@anim/center_in</item>
+        <item name="android:windowExitAnimation">@anim/center_out</item>
+    </style>
+
+    <!-- 加载弹框样式 -->
+    <style name="LightDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan
+        </item>
+    </style>
+    <style name="LightProgressDialog" parent="@style/LightDialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+</resources>

@@ -1,3 +1,5 @@
 rootProject.name='ProMusic'
-include ':app'
+include ':app', ':commondialog'
 include ':opengl'
+include ':livepusher'
+include ':filmfactory'

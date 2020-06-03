@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="文件ID: "
+                android:textColor="@color/colorMain"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/media_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:text=""
+                android:textColor="@color/colorMain"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="文件名称: "
+                android:textColor="@color/colorMain"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/media_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:text=""
+                android:textColor="@color/colorMain"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="文件大小: "
+                android:textColor="@color/colorMain"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/media_size"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:text=""
+                android:textColor="@color/colorMain"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="添加时间: "
+                android:textColor="@color/colorMain"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/media_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:text=""
+                android:textColor="@color/colorMain"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="文件路径: "
+                android:textColor="@color/colorMain"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/media_position"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:text=""
+                android:textColor="@color/colorMain"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/media_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/solid_blue"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="删除"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -12,6 +12,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/commondialog" />
+            <option value="$PROJECT_DIR$/filmfactory" />
+            <option value="$PROJECT_DIR$/livepusher" />
             <option value="$PROJECT_DIR$/opengl" />
           </set>
         </option>

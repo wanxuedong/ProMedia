@@ -2,6 +2,7 @@ package com.play.opengl.egl.texture;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.play.opengl.egl.base.WLEGLSurfaceView;
 
@@ -9,6 +10,8 @@ import com.play.opengl.egl.base.WLEGLSurfaceView;
  * 实现图片渲染的视图
  **/
 public class WlGLTextureView extends WLEGLSurfaceView {
+
+    private WlTextureRender wlTextureRender;
 
     public WlGLTextureView(Context context) {
         this(context, null);
@@ -20,6 +23,19 @@ public class WlGLTextureView extends WLEGLSurfaceView {
 
     public WlGLTextureView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setRender(new WlTextureRender(context));
+        wlTextureRender = new WlTextureRender(context);
+        setRender(wlTextureRender);
+    }
+
+    public WlTextureRender getWlTextureRender() {
+        return wlTextureRender;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.d("WlGLTextureView", MeasureSpec.getSize(widthMeasureSpec) + " : " + MeasureSpec.getSize(heightMeasureSpec));
+        wlTextureRender.setScreenWidth(MeasureSpec.getSize(widthMeasureSpec));
+        wlTextureRender.setScreenHeight(MeasureSpec.getSize(heightMeasureSpec));
     }
 }

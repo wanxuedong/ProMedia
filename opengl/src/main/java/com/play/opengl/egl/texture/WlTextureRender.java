@@ -29,7 +29,12 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
             -1f, -1f,
             1f, -1f,
             -1f, 1f,
-            1f, 1f
+            1f, 1f,
+
+            -0.5f, -0.5f,
+            0.5f, -0.5f,
+            -0.5f, 0.5f,
+            0.5f, 0.5f
     };
     private FloatBuffer vertexBuffer;
 
@@ -55,6 +60,7 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
      * 普通纹理
      **/
     private int textureId;
+    private int moreTextureId;
     /**
      * vbo的id
      **/
@@ -80,9 +86,9 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
     private float[] matrix = new float[16];
 
     /**
-     * 屏幕的宽高
+     * 屏幕的宽高(其实应该是控件的宽高)
      **/
-    private int screenWidth, screenHeight;
+    private int screenWidth = 0, screenHeight = 0;
 
     /**
      * 图片的宽高
@@ -112,9 +118,11 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
     @Override
     public void onSurfaceCreated() {
 
-        int[] size = WlShaderUtil.getScreenSie(context);
-        screenWidth = size[0];
-        screenHeight = size[1];
+        if (screenWidth == 0 || screenWidth == 0) {
+            int[] size = WlShaderUtil.getScreenSie(context);
+            screenWidth = size[0];
+            screenHeight = size[1];
+        }
 
         fboRender.onCreate();
 
@@ -147,12 +155,10 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
 
         //创建纹理
         textureId = WlShaderUtil.loadTexture(context, R.drawable.androids);
+        moreTextureId = WlShaderUtil.loadTexture(context, R.drawable.ghnl);
 //        float[] ImgSize = WlShaderUtil.getImgSize(context, R.drawable.androids);
 //        imgWidth = ImgSize[0];
 //        imgHeight = ImgSize[1];
-
-        //绑定纹理
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
         //创建fbo纹理id
         int[] fboIds = new int[1];
@@ -195,6 +201,10 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         //解绑fbo
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
+        if (onRenderCreateListener != null) {
+            onRenderCreateListener.onCreate(fboTextureId);
+        }
     }
 
     @Override
@@ -229,13 +239,13 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
         //使用正交投影,保证了图片不会发生拉伸形变
         GLES20.glUniformMatrix4fv(uMatrix, 1, false, matrix, 0);
 
-        //绑定纹理
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
         //绑定vbo
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
         //绑定fbo
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
 
+        //绑定第一个纹理
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
         //激活属性并进行赋值，需要注意的是，如果使用vbo，最后一个参数传入偏移量即可，如果没用vbo，就传入顶点和纹理缓存
         GLES20.glEnableVertexAttribArray(vPosition);
         GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 8,
@@ -243,7 +253,18 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
         GLES20.glEnableVertexAttribArray(fPosition);
         GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 8,
                 vertexData.length * 4);
+        //绘制图像
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
+        //绑定第二个纹理
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, moreTextureId);
+        //激活属性并进行赋值
+        GLES20.glEnableVertexAttribArray(vPosition);
+        GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 8,
+                32);
+        GLES20.glEnableVertexAttribArray(fPosition);
+        GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 8,
+                vertexData.length * 4);
         //绘制图像
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
@@ -257,5 +278,23 @@ public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
         //fbo绘制
         fboRender.onDraw(fboTextureId);
 
+    }
+
+    private OnRenderCreateListener onRenderCreateListener;
+
+    public void setOnRenderCreateListener(OnRenderCreateListener onRenderCreateListener) {
+        this.onRenderCreateListener = onRenderCreateListener;
+    }
+
+    public interface OnRenderCreateListener {
+        void onCreate(int textureId);
+    }
+
+    public void setScreenWidth(int screenWidth) {
+        this.screenWidth = screenWidth;
+    }
+
+    public void setScreenHeight(int screenHeight) {
+        this.screenHeight = screenHeight;
     }
 }

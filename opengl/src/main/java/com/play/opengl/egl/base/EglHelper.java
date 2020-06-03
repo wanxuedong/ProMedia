@@ -100,11 +100,11 @@ public class EglHelper {
         }
     }
 
-    public EGLContext getmEglContext() {
+    public EGLContext getEglContext() {
         return mEglContext;
     }
 
-    public void destoryEgl() {
+    public void destroyEgl() {
         if (mEgl != null) {
             mEgl.eglMakeCurrent(mEglDisplay, EGL10.EGL_NO_SURFACE,
                     EGL10.EGL_NO_SURFACE,

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.VideoFactoryActivity">
+
+        <com.simple.filmfactory.widget.BaseHeadView
+            android:id="@+id/base_head"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:bgColor="@color/colorMain"
+            app:centerTitle="视频加工"
+            app:rightImg="@mipmap/file" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/base_head"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/video_recording"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/solid_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="录制视频"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/video_crop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/solid_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="视频裁剪"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/video_splicing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/solid_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="视频拼接"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/video_watermark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="25dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/solid_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="添加水印"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</layout>

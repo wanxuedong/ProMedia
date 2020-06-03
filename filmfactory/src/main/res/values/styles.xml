@@ -1,0 +1,60 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <style name="AppBlack" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <!--通用状态栏头部控件自定义属性-->
+    <declare-styleable name="BaseHeader">
+        <attr name="leftImg" format="reference" />
+        <attr name="rightImg" format="reference" />
+        <attr name="showLeftImg" format="boolean" />
+        <attr name="leftTitle" format="string" />
+        <attr name="centerTitle" format="string" />
+        <attr name="rightTitle" format="string" />
+        <attr name="leftTitleColor" format="color" />
+        <attr name="centerTitleColor" format="color" />
+        <attr name="rightTitleColor" format="color" />
+        <attr name="bgColor" format="color" />
+    </declare-styleable>
+    <!--圆形头像控件自定义属性-->
+    <declare-styleable name="RotatingCircleView">
+        <attr name="circle_width" format="dimension" />
+        <attr name="circle_color" format="color" />
+        <attr name="circle_kind" format="flags">
+            <flag name="all" value="0x1111" />
+            <flag name="top_left" value="0x0001" />
+            <flag name="top_right" value="0x0010" />
+            <flag name="bottom_left" value="0x0100" />
+            <flag name="bottom_right" value="0x1000" />
+        </attr>
+        <attr name="circle_radius" format="dimension" />
+    </declare-styleable>
+    <declare-styleable name="viewMove">
+        <attr name="view_count" format="integer" />
+        <attr name="view_color" format="color" />
+        <attr name="view_height" format="dimension" />
+        <attr name="view_width" format="dimension" />
+        <attr name="defaultposition" format="integer" />
+    </declare-styleable>
+    <!--    导航条-->
+    <declare-styleable name="gateView">
+        <attr name="chose_color" format="color" />
+        <attr name="unchose_color" format="color" />
+        <attr name="line_color" format="color" />
+        <attr name="chose_size" format="dimension" />
+        <attr name="unchose_size" format="dimension" />
+        <attr name="line_height" format="dimension" />
+        <attr name="line_width" format="dimension" />
+        <attr name="line_padding" format="dimension" />
+        <attr name="default_chose" format="integer" />
+    </declare-styleable>
+</resources>

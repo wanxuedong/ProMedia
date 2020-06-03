@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.filemanagement.audio.VideoFileListActivity"
+        android:background="@color/white">
+
+        <com.simple.filmfactory.widget.BaseHeadView
+            android:id="@+id/base_head"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:centerTitle="音频列表" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/audio_file_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/add_audio"
+            android:layout_below="@+id/base_head"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:id="@+id/add_audio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="15dp"
+            android:background="@drawable/solid_blue"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="添加音频到本地"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+    </RelativeLayout>
+
+</layout>
