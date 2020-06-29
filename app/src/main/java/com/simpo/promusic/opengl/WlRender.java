@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 import android.view.Surface;
 
 import com.simpo.promusic.R;
@@ -12,6 +13,7 @@ import com.simpo.promusic.R;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -115,12 +117,9 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         //设置清屏的颜色值
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        if(renderType == RENDER_YUV)
-        {
+        if (renderType == RENDER_YUV) {
             renderYUV();
-        }
-        else if(renderType == RENDER_MEDIACODEC)
-        {
+        } else if (renderType == RENDER_MEDIACODEC) {
             renderMediaCodec();
         }
         //按照GL_TRIANGLE_STRIP模式绘制三角形的合成区域
@@ -159,8 +158,7 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
         }
     }
 
-    private void initRenderMediacodec()
-    {
+    private void initRenderMediacodec() {
         String vertexSource = WlShaderUtil.readRawTxt(context, R.raw.open_vertex_shader);
         String fragmentSource = WlShaderUtil.readRawTxt(context, R.raw.open_fragment_mediacodec);
         program_mediacodec = WlShaderUtil.createProgram(vertexSource, fragmentSource);
@@ -182,14 +180,12 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
         surface = new Surface(surfaceTexture);
         surfaceTexture.setOnFrameAvailableListener(this);
 
-        if(onSurfaceCreateListener != null)
-        {
+        if (onSurfaceCreateListener != null) {
             onSurfaceCreateListener.onSurfaceCreate(surface);
         }
     }
 
-    private void renderMediaCodec()
-    {
+    private void renderMediaCodec() {
         surfaceTexture.updateTexImage();
         GLES20.glUseProgram(program_mediacodec);
 
@@ -210,6 +206,7 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
         this.y = ByteBuffer.wrap(y);
         this.u = ByteBuffer.wrap(u);
         this.v = ByteBuffer.wrap(v);
+        Log.d("setYUVRenderData", width_yuv + " ： " + height_yuv + " ： " + Arrays.toString(y) + "");
     }
 
     private void renderYUV() {
@@ -265,19 +262,17 @@ public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameA
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        if(onRenderListener != null)
-        {
+        if (onRenderListener != null) {
             onRenderListener.onRender();
         }
     }
 
 
-    public interface OnSurfaceCreateListener
-    {
+    public interface OnSurfaceCreateListener {
         void onSurfaceCreate(Surface surface);
     }
 
-    public interface OnRenderListener{
+    public interface OnRenderListener {
         void onRender();
     }
 

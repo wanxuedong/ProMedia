@@ -9,6 +9,8 @@ import android.graphics.Typeface;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.simple.filmfactory.utils.logutils.LogUtil;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,7 +43,7 @@ public class WlShaderUtil {
             int[] compile = new int[1];
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
             if (compile[0] != GLES20.GL_TRUE) {
-                Log.d("com_simple_livepusher", "shader compile error");
+                LogUtil.e("WlShaderUtil", "shader compile error");
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }

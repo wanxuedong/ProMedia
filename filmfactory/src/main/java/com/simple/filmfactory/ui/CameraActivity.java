@@ -56,6 +56,11 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
     private boolean isTakePhoto = true;
 
     /**
+     * 是否在拍照聚焦中
+     **/
+    private boolean isFocus = false;
+
+    /**
      * 当前是否处于摄像状态
      **/
     private boolean isTakeVideo = false;
@@ -133,43 +138,47 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
     public void start() {
         if (isTakePhoto) {
             //当前处于拍照模式
-            //先聚焦成功，再拍照
-            CameraDetecte.toFocus(cameraBinding.cameraView.getWlCamera().getCamera(), new CallBack() {
-                @Override
-                public Object call(String... content) {
-                    if ("focus_on_success".equals(content[0])) {
-                        cameraBinding.cameraView.getWlCamera().getCamera().takePicture(null, null, new Camera.PictureCallback() {
-                            @Override
-                            public void onPictureTaken(final byte[] data, Camera camera) {
-                                //需要注意的是，拍照后，预览界面会被卡住，如果需要恢复，需要调用下面代码强制刷新预览界面
-                                cameraBinding.cameraView.getWlCamera().switchCamera(cameraBinding.cameraView.getWlCamera().isBack);
-                                ThreadX.x().run(new AbstractLife() {
-                                    @Override
-                                    public void run() {
-                                        super.run();
-                                        //将图片展示在左下角
-                                        Bitmap bitmap = ImageUtil.rotateBitmap(ImageUtil.Bytes2Bitmap(data), isBack ? 90 : -90);
-                                        Bitmap waterMap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                                        if (cameraSets.isWaterOpen()) {
-                                            bitmap = WaterUtil.addWater(CameraActivity.this, bitmap, waterMap, "内涵段子tv", Gravity.RIGHT | Gravity.BOTTOM);
-                                        }
-                                        final Bitmap finalBitmap = bitmap;
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                cameraBinding.cameraAlbum.setImageBitmap(finalBitmap);
+            if (!isFocus) {
+                //先聚焦成功，再拍照
+                isFocus = true;
+                CameraDetecte.toFocus(cameraBinding.cameraView.getWlCamera().getCamera(), new CallBack() {
+                    @Override
+                    public Object call(String... content) {
+                        if ("focus_on_success".equals(content[0])) {
+                            cameraBinding.cameraView.getWlCamera().getCamera().takePicture(null, null, new Camera.PictureCallback() {
+                                @Override
+                                public void onPictureTaken(final byte[] data, Camera camera) {
+                                    //需要注意的是，拍照后，预览界面会被卡住，如果需要恢复，需要调用下面代码强制刷新预览界面
+                                    cameraBinding.cameraView.getWlCamera().switchCamera(cameraBinding.cameraView.getWlCamera().isBack);
+                                    ThreadX.x().run(new AbstractLife() {
+                                        @Override
+                                        public void run() {
+                                            super.run();
+                                            //将图片展示在左下角
+                                            Bitmap bitmap = ImageUtil.rotateBitmap(ImageUtil.Bytes2Bitmap(data), isBack ? 90 : -90);
+                                            Bitmap waterMap = BitmapFactory.decodeResource(getResources(), R.mipmap.dipian, null);
+                                            if (cameraSets.isWaterOpen()) {
+                                                bitmap = WaterUtil.addWater(CameraActivity.this, bitmap, waterMap, "内涵段子tv", Gravity.RIGHT | Gravity.BOTTOM);
                                             }
-                                        });
-                                        //将图片旋转后并刷新至系统图库
-                                        ImageUtil.savePhotoToSD(bitmap, CameraActivity.this, null);
-                                    }
-                                });
-                            }
-                        });
+                                            final Bitmap finalBitmap = bitmap;
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    cameraBinding.cameraAlbum.setImageBitmap(finalBitmap);
+                                                }
+                                            });
+                                            //将图片旋转后并刷新至系统图库
+                                            ImageUtil.savePhotoToSD(bitmap, CameraActivity.this, null);
+                                        }
+                                    });
+                                    isFocus = false;
+                                }
+                            });
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
+            }
         } else {
             //当前处于录像模式
             if (isTakeVideo) {

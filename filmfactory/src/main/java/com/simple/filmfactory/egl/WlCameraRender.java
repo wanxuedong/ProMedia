@@ -5,7 +5,6 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.util.Log;
 
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.egl.base.BaseEGLSurfaceView;
@@ -147,9 +146,7 @@ public class WlCameraRender implements BaseEGLSurfaceView.WlGLRender, SurfaceTex
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, fboTextureid, 0);
         //检查fbo绑定是否成功
         if (GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER) != GLES20.GL_FRAMEBUFFER_COMPLETE) {
-            LogUtil.e("WlCameraRender", "fbo wrong");
-        } else {
-            LogUtil.e("WlCameraRender", "fbo success");
+            LogUtil.e("WlCameraRender", "fbo binding wrong!");
         }
 
         //解绑纹理

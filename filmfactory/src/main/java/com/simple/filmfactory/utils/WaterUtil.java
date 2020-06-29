@@ -38,7 +38,8 @@ public class WaterUtil {
             int ww = watermark.getWidth();
             int wh = watermark.getHeight();
             paint.setAlpha(50);
-            cv.drawBitmap(watermark, w - ww + 5, h - wh + 5, paint);// 在src的右下角画入水印
+            // 在src的左下角画入水印
+            cv.drawBitmap(watermark, margin, h - wh - margin, paint);
         }
         //加入文字
         if (title != null) {
