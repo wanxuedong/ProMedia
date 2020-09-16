@@ -4,6 +4,9 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
+/**
+ * @author mac
+ */
 public class WlGLSurfaceView extends GLSurfaceView {
 
     private WlRender wlRender;

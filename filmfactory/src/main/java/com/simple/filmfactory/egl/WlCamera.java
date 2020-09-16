@@ -16,6 +16,9 @@ import com.simple.filmfactory.utils.logutils.LogUtil;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author mac
+ */
 public class WlCamera {
 
     private Camera camera;

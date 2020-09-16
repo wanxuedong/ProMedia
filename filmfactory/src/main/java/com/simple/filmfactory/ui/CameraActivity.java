@@ -8,7 +8,6 @@ import android.hardware.Camera;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 
@@ -38,7 +37,9 @@ import static com.simple.filmfactory.utils.FileCataLog.BASE_NAME;
 
 /**
  * 拍照或录制视频
- **/
+ *
+ * @author mac
+ */
 public class CameraActivity extends BaseActivity implements GateView.OnNavigateLisenter {
 
     private ActivityCameraBinding cameraBinding;

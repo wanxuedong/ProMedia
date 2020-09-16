@@ -108,14 +108,19 @@ public class WlCameraRender implements BaseEGLSurfaceView.WlGLRender, SurfaceTex
         fPosition = GLES20.glGetAttribLocation(program, "f_Position");
         umatrix = GLES20.glGetUniformLocation(program, "u_Matrix");
 
-        //创建vbo
         int[] vbos = new int[1];
+        //创建vbo
         GLES20.glGenBuffers(1, vbos, 0);
+        //指定vbo的唯一id
         vboId = vbos[0];
 
+        //绑定vbo唯一id到缓冲区
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboId);
+        //开启一块用户定义的数据空间，用于存储数据，并且定义了数据管理模式
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4 + fragmentData.length * 4, null, GLES20.GL_STATIC_DRAW);
+        //将用户创建的数据绑定到缓冲区，此后可高效的使用这些数据
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, 0, vertexData.length * 4, vertexBuffer);
+        //以下俩步同上，事实上开辟空间和绑定数据可写成一行代码，这里为了方便理解进行了拆分
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, fragmentData.length * 4, fragmentBuffer);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
@@ -197,7 +202,7 @@ public class WlCameraRender implements BaseEGLSurfaceView.WlGLRender, SurfaceTex
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClearColor(1f, 0f, 0f, 1f);
         GLES20.glViewport(0, 0, screenWidth, screenHeight);
-        //使用编译链
+        //激活程序编译链
         GLES20.glUseProgram(program);
 
         //使用vbo，降低资源消耗
@@ -210,14 +215,16 @@ public class WlCameraRender implements BaseEGLSurfaceView.WlGLRender, SurfaceTex
         //绑定摄像头纹理
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, cameraTextureid);
 
+        //激活顶点属性，默认禁止
         GLES20.glEnableVertexAttribArray(vPosition);
+        //告诉OpenGL该如何解析顶点数据
         GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 8,
                 0);
         GLES20.glEnableVertexAttribArray(fPosition);
         GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 8,
                 vertexData.length * 4);
 
-        //绘制顶点
+        //最终的绘制代码，根据已经配置的着色器等绘制图形
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
         //解绑纹理和vbo

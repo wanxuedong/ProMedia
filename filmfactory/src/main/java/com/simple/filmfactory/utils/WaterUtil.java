@@ -12,7 +12,8 @@ import android.view.Gravity;
 
 /**
  * 添加水印工具
- **/
+ *
+ * @author mac*/
 public class WaterUtil {
 
     /**
@@ -31,7 +32,8 @@ public class WaterUtil {
         Bitmap newb = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         // 创建一个新的和SRC长度宽度一样的位图
         Canvas cv = new Canvas(newb);
-        cv.drawBitmap(src, 0, 0, null);// 在 0，0坐标开始画入src
+        // 在 0，0坐标开始画入src
+        cv.drawBitmap(src, 0, 0, null);
         Paint paint = new Paint();
         //加入图片
         if (watermark != null) {

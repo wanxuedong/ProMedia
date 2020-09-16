@@ -5,6 +5,8 @@ import android.media.MediaFormat;
 import android.text.TextUtils;
 import android.view.Surface;
 
+import com.simpo.promusic.opengl.WlGLSurfaceView;
+import com.simpo.promusic.opengl.WlRender;
 import com.simpo.promusic.player.bean.MuteEnum;
 import com.simpo.promusic.player.bean.WlTimeInfoBean;
 import com.simpo.promusic.player.listener.WlOnCompleteListener;
@@ -17,8 +19,6 @@ import com.simpo.promusic.player.listener.WlOnValumeDBListener;
 import com.simpo.promusic.player.log.MyLog;
 import com.simpo.promusic.player.threadXUtil.AbstractLife;
 import com.simpo.promusic.player.threadXUtil.ThreadX;
-import com.simpo.promusic.opengl.WlGLSurfaceView;
-import com.simpo.promusic.opengl.WlRender;
 import com.simpo.promusic.utils.WlVideoSupportUitl;
 
 import java.nio.ByteBuffer;
@@ -434,8 +434,17 @@ public class MusicPlayer {
         n_speed(speed);
     }
 
+    /**
+     * 文件推流
+     **/
+    public void updateFile(String path, String rtmpUrl) {
+        n_update_file(path,  rtmpUrl);
+    }
+
 
     private native void n_prepared(String source);
+
+    private native void n_update_file(String name, String url);
 
     private native void n_start();
 

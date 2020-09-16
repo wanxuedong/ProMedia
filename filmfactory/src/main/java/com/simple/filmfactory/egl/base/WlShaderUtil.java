@@ -34,16 +34,39 @@ public class WlShaderUtil {
         return sb.toString();
     }
 
+    public static int createProgram(String vertexSource, String fragmentSoruce) {
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSoruce);
+
+        if (vertexShader != 0 && fragmentShader != 0) {
+            //创建一个着色器程序编译链，目的是链接顶点着色器和片段着色器
+            int program = GLES20.glCreateProgram();
+
+            //依次将着色器对象依附到编译链上
+            GLES20.glAttachShader(program, vertexShader);
+            GLES20.glAttachShader(program, fragmentShader);
+
+            //链接已依附的着色器对象
+            GLES20.glLinkProgram(program);
+            return program;
+        }
+        return 0;
+    }
+
     private static int loadShader(int shaderType, String source) {
         int shader = GLES20.glCreateShader(shaderType);
         if (shader != 0) {
+            //根据着色器类型和着色器源码来创建指定类型的着色器对象
             GLES20.glShaderSource(shader, source);
+            //编译指定的着色器代码
             GLES20.glCompileShader(shader);
 
             int[] compile = new int[1];
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
+            //用定义的整形来判断是否编译成功，并给出适当的错误提示
             if (compile[0] != GLES20.GL_TRUE) {
                 LogUtil.e("WlShaderUtil", "shader compile error");
+                //编译失败，删除着色器对象
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }
@@ -51,22 +74,6 @@ public class WlShaderUtil {
         } else {
             return 0;
         }
-    }
-
-    public static int createProgram(String vertexSource, String fragmentSoruce) {
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSoruce);
-
-        if (vertexShader != 0 && fragmentShader != 0) {
-            int program = GLES20.glCreateProgram();
-
-            GLES20.glAttachShader(program, vertexShader);
-            GLES20.glAttachShader(program, fragmentShader);
-
-            GLES20.glLinkProgram(program);
-            return program;
-        }
-        return 0;
     }
 
 

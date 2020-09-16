@@ -30,6 +30,7 @@ add_library(
         src/main/cpp/WlVideo.cpp
         src/main/cpp/WlQueue.cpp
         src/main/cpp/WlPlaystatus.cpp
+        src/main/cpp/RtmpUpdate.cpp
 
         src/main/cpp/soundtouch/SoundTouch/AAFilter.cpp
         src/main/cpp/soundtouch/SoundTouch/FIFOSampleBuffer.cpp

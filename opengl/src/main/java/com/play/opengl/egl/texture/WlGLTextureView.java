@@ -8,7 +8,8 @@ import com.play.opengl.egl.base.WLEGLSurfaceView;
 
 /**
  * 实现图片渲染的视图
- **/
+ *
+ * @author mac*/
 public class WlGLTextureView extends WLEGLSurfaceView {
 
     private WlTextureRender wlTextureRender;

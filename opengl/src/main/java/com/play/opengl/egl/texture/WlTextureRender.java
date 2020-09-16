@@ -16,7 +16,8 @@ import java.nio.FloatBuffer;
 
 /**
  * 绘制图像流程示例
- **/
+ *
+ * @author mac*/
 public class WlTextureRender implements WLEGLSurfaceView.WlGLRender {
 
     private Context context;

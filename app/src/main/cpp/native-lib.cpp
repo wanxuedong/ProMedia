@@ -2,12 +2,14 @@
 #include <string>
 #include "WlCallJava.h"
 #include "WlFFmpeg.h"
+#include "RtmpUpdate.h"
 
 
 WlCallJava *wlCallJava;
 JavaVM *javaVm;
 WlFFmpeg *fFmpeg;
 WlPlaystatus *playstatus = NULL;
+RtmpUpdate *rtmpUpdate = NULL;
 
 bool nexit = true;
 pthread_t thread_start;
@@ -28,6 +30,19 @@ void *startCallBack(void *data) {
     WlFFmpeg *fFmpeg = (WlFFmpeg *) data;
     fFmpeg->start();
     return 0;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_simpo_promusic_player_MusicPlayer_n_1update_1file(JNIEnv *env, jobject thiz, jstring name,
+                                                           jstring url) {
+    LOGE("start");
+    const char* fileName = env->GetStringUTFChars(name, 0);
+    const char* rtmpUrl = env->GetStringUTFChars(url, 0);
+    if (rtmpUpdate == NULL){
+        LOGE("one");
+        rtmpUpdate = new RtmpUpdate();
+    }
+    rtmpUpdate->upDateFile(fileName, rtmpUrl);
 }
 
 extern "C"

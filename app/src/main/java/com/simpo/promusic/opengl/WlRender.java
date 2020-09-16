@@ -18,6 +18,9 @@ import java.util.Arrays;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+/**
+ * @author mac
+ */
 public class WlRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
 
 
