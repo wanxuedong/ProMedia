@@ -21,6 +21,7 @@ public:
     _JNIEnv *jniEnv = NULL;
     jobject job = NULL;
 
+    jmethodID jmid_onlog;
     jmethodID jmid_parpared;
     jmethodID jmid_load;
     jmethodID jmid_timeinfo;
@@ -38,6 +39,8 @@ public:
 
     ~WlCallJava();
 
+    void onLogMessage(int type, jstring message);
+
     void onCallPrepared(int type);
 
     void onCallLoad(int type, bool load);
@@ -54,10 +57,10 @@ public:
 
     bool onCallIsSupportVideo(const char *ffcodecname);
 
-    void onCallInitMediacodec(const char *mime, int width, int height, int csd0_size, int csd1_size, uint8_t *csd_0, uint8_t *csd_1);
+    void onCallInitMediacodec(const char *mime, int width, int height, int csd0_size, int csd1_size,
+                              uint8_t *csd_0, uint8_t *csd_1);
 
     void onCallDecodeAVPacket(int datasize, uint8_t *data);
-
 };
 
 

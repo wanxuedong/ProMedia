@@ -14,6 +14,7 @@ WlCallJava::WlCallJava(_JavaVM *javaVm, _JNIEnv *jniEnv, jobject *obj) {
             LOGE("get jclass wrong");
         }
     }
+    jmid_onlog = jniEnv->GetMethodID(jcls, "onLogMessage", "(ILjava/lang/String;)V");
     jmid_parpared = jniEnv->GetMethodID(jcls, "onCallPrepared", "()V");
     jmid_load = jniEnv->GetMethodID(jcls, "onCallLoad", "(Z)V");
     jmid_timeinfo = jniEnv->GetMethodID(jcls, "onCallTimeInfo", "(II)V");
@@ -21,14 +22,34 @@ WlCallJava::WlCallJava(_JavaVM *javaVm, _JNIEnv *jniEnv, jobject *obj) {
     jmid_error = jniEnv->GetMethodID(jcls, "onCallError", "(ILjava/lang/String;)V");
     jmid_valumedb = jniEnv->GetMethodID(jcls, "onCallValumeDB", "(I)V");
     jmid_renderyuv = jniEnv->GetMethodID(jcls, "onCallRenderYUV", "(II[B[B[B)V");
-    jmid_supportvideo = jniEnv->GetMethodID(jcls, "onCallIsSupportMediaCodec","(Ljava/lang/String;)Z");
-    jmid_initmediacodec = jniEnv->GetMethodID(jcls, "initMediaCodec","(Ljava/lang/String;II[B[B)V");
+    jmid_supportvideo = jniEnv->GetMethodID(jcls, "onCallIsSupportMediaCodec",
+                                            "(Ljava/lang/String;)Z");
+    jmid_initmediacodec = jniEnv->GetMethodID(jcls, "initMediaCodec",
+                                              "(Ljava/lang/String;II[B[B)V");
     jmid_decodeavpacket = jniEnv->GetMethodID(jcls, "decodeAVPacket", "(I[B)V");
 
 }
 
 WlCallJava::~WlCallJava() {
 
+
+}
+
+void WlCallJava::onLogMessage(int type, jstring message) {
+
+    if (type == MAIN_THREAD) {
+        jniEnv->CallVoidMethod(job, jmid_parpared);
+    } else if (type == CHILD_THREAD) {
+        JNIEnv *jniEnv1;
+        if (javaVm->AttachCurrentThread(&jniEnv1, 0) != JNI_OK) {
+            if (LOG_DEBUG) {
+                LOGE("get child thread jnienv worng");
+            }
+            return;
+        }
+        jniEnv1->CallVoidMethod(job, jmid_parpared, type, message);
+        javaVm->DetachCurrentThread();
+    }
 
 }
 

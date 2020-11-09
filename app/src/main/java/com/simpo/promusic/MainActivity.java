@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void begin(View view) {
-        wlPlayer.updateFile(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/泰坦尼克号.mkv", "rtmp://192.168.3.95:1935/rtmplive/test");
+        wlPlayer.updateFile(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/杞人忧天_标清.flv", "rtmp://192.168.3.98:1935/rtmplive/test");
 //        if (PermissionsUtils.getStorgePermission(this)) {
 //            isPlay = true;
 //            if (musicUrl.getText() != null && !TextUtils.isEmpty(musicUrl.getText().toString())) {

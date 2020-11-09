@@ -12,6 +12,7 @@ import com.simpo.promusic.player.bean.WlTimeInfoBean;
 import com.simpo.promusic.player.listener.WlOnCompleteListener;
 import com.simpo.promusic.player.listener.WlOnErrorListener;
 import com.simpo.promusic.player.listener.WlOnLoadListener;
+import com.simpo.promusic.player.listener.WlOnLogListener;
 import com.simpo.promusic.player.listener.WlOnPauseResumeListener;
 import com.simpo.promusic.player.listener.WlOnPreparedListener;
 import com.simpo.promusic.player.listener.WlOnTimeInfoListener;
@@ -69,6 +70,7 @@ public class MusicPlayer {
      **/
     private static float pitch = 1.0f;
 
+    private WlOnLogListener wlOnLogListener;
     private WlOnPreparedListener wlOnPreparedListener;
     private WlOnLoadListener wlOnLoadListener;
     private WlOnPauseResumeListener wlOnPauseResumeListener;
@@ -102,6 +104,10 @@ public class MusicPlayer {
         });
     }
 
+    public void setWlOnLogListener(WlOnLogListener wlOnLogListener) {
+        this.wlOnLogListener = wlOnLogListener;
+    }
+
     /**
      * 设置准备状态监听
      **/
@@ -131,6 +137,15 @@ public class MusicPlayer {
 
     public void setWlOnValumeDBListener(WlOnValumeDBListener wlOnValumeDBListener) {
         this.wlOnValumeDBListener = wlOnValumeDBListener;
+    }
+
+    /**
+     * 等待C++层回调即可，表示数据准备完成
+     **/
+    public void onLogMessage(int type, String message) {
+        if (wlOnLogListener != null) {
+            wlOnLogListener.onLog(type, message);
+        }
     }
 
     /**
@@ -438,7 +453,7 @@ public class MusicPlayer {
      * 文件推流
      **/
     public void updateFile(String path, String rtmpUrl) {
-        n_update_file(path,  rtmpUrl);
+        n_update_file(path, rtmpUrl);
     }
 
 
