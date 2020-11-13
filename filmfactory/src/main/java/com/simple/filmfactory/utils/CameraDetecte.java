@@ -112,7 +112,9 @@ public class CameraDetecte {
                 hasAuto = true;
                 if (handler != null) {
                     handler.sendMessageDelayed(handler.obtainMessage(), AUTO_FOCUS_TIME);
-                    toFocus(camera, null);
+                    if (!isCamera) {
+                        toFocus(camera, null);
+                    }
                 }
             }
         };
@@ -129,12 +131,19 @@ public class CameraDetecte {
     }
 
     /**
+     * 是否在拍照或录像中
+     * 如果是，需要关闭自动聚焦功能，保证callBack不为空能正常回调
+     **/
+    private static boolean isCamera = false;
+
+    /**
      * 手动对相机进行聚焦,需要相机处于运行状态才可以，比如调用拍照后，就不可以
      **/
     public static boolean toFocus(Camera camera, final CallBack callBack) {
         if (camera == null) {
             return false;
         }
+        isCamera = true;
         try {
             camera.autoFocus(new Camera.AutoFocusCallback() {
                 @Override
@@ -142,6 +151,7 @@ public class CameraDetecte {
                     if (callBack != null) {
                         callBack.call("focus_on_success");
                     }
+                    isCamera = false;
                 }
             });
             return true;
