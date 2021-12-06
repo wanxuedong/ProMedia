@@ -2,8 +2,13 @@ package com.simpo.promusic.player;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.Surface;
+
+import androidx.annotation.NonNull;
 
 import com.simpo.promusic.opengl.WlGLSurfaceView;
 import com.simpo.promusic.opengl.WlRender;
@@ -46,6 +51,39 @@ public class MusicPlayer {
     }
 
     /**
+     * 日志回调
+     **/
+    private final int LOG = 10001;
+    /**
+     * 多媒体读取完毕回调
+     **/
+    private final int PREPARED = 10002;
+    /**
+     * 加载中回调
+     **/
+    private final int LOAD = 10003;
+    /**
+     * 时间内进度回调
+     **/
+    private final int TIME_INFO = 10004;
+    /**
+     * 播放完毕回调
+     **/
+    private final int COMPLETE = 10005;
+    /**
+     * 下一个回调
+     **/
+    private final int ON_NEXT = 10006;
+    /**
+     * 错误回调
+     **/
+    private final int ERROR = 10007;
+    /**
+     * 声音大小回调
+     **/
+    private final int SOUND = 10008;
+
+    /**
      * 数据源
      **/
     private String source;
@@ -53,6 +91,64 @@ public class MusicPlayer {
     private WlTimeInfoBean wlTimeInfoBean;
     private boolean playNext = false;
     private static int duration = -1;
+
+    private Handler handler;
+
+    public MusicPlayer() {
+        handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case LOG:
+                        if (wlOnLogListener != null) {
+                            wlOnLogListener.onLog(msg.arg1, msg.obj.toString());
+                        }
+                        break;
+                    case PREPARED:
+                        if (wlOnPreparedListener != null) {
+                            wlOnPreparedListener.onPrepared();
+                        }
+                        break;
+                    case LOAD:
+                        if (wlOnLoadListener != null) {
+                            wlOnLoadListener.onLoad((Boolean) msg.obj);
+                        }
+                        break;
+                    case TIME_INFO:
+                        if (wlOnTimeInfoListener != null) {
+                            wlTimeInfoBean = (WlTimeInfoBean) msg.obj;
+                            wlOnTimeInfoListener.onTimeInfo(wlTimeInfoBean);
+                        }
+                        break;
+                    case COMPLETE:
+                        if (wlOnCompleteListener != null) {
+                            wlOnCompleteListener.onComplete();
+                        }
+                        break;
+                    case ON_NEXT:
+                        if ((Boolean) msg.obj) {
+                            playNext = false;
+                            prepare();
+                        }
+                        break;
+                    case ERROR:
+                        if (wlOnErrorListener != null) {
+                            stop();
+                            wlOnErrorListener.onError(msg.arg1, (String) msg.obj);
+                        }
+                        break;
+                    case SOUND:
+                        if (wlOnValumeDBListener != null) {
+                            wlOnValumeDBListener.onDbValue(msg.arg1);
+                        }
+                        break;
+                    default:
+                }
+            }
+        };
+    }
+
     /**
      * 音量大小，0-100
      **/
@@ -143,42 +239,46 @@ public class MusicPlayer {
      * 等待C++层回调即可，表示数据准备完成
      **/
     public void onLogMessage(int type, String message) {
-        if (wlOnLogListener != null) {
-            wlOnLogListener.onLog(type, message);
-        }
+        Message msg = handler.obtainMessage();
+        msg.what = LOG;
+        msg.arg1 = type;
+        msg.obj = message;
+        handler.sendMessage(msg);
     }
 
     /**
      * 等待C++层回调即可，表示数据准备完成
      **/
     public void onCallPrepared() {
-        if (wlOnPreparedListener != null) {
-            wlOnPreparedListener.onPrepared();
-        }
+        Message msg = handler.obtainMessage();
+        msg.what = PREPARED;
+        handler.sendMessage(msg);
     }
 
     /**
      * 数据加载中回调
      **/
     public void onCallLoad(boolean load) {
-        if (wlOnLoadListener != null) {
-            wlOnLoadListener.onLoad(load);
-        }
+        Message msg = handler.obtainMessage();
+        msg.what = LOAD;
+        msg.obj = load;
+        handler.sendMessage(msg);
     }
 
     /**
      * 当前播放时长和总时长回调
      **/
     public void onCallTimeInfo(int currentTime, int totalTime) {
-        if (wlOnTimeInfoListener != null) {
-            if (wlTimeInfoBean == null) {
-                wlTimeInfoBean = new WlTimeInfoBean();
-            }
-            duration = totalTime;
-            wlTimeInfoBean.setCurrentTime(currentTime);
-            wlTimeInfoBean.setTotalTime(totalTime);
-            wlOnTimeInfoListener.onTimeInfo(wlTimeInfoBean);
+        duration = totalTime;
+        if (wlTimeInfoBean == null) {
+            wlTimeInfoBean = new WlTimeInfoBean();
         }
+        wlTimeInfoBean.setCurrentTime(currentTime);
+        wlTimeInfoBean.setTotalTime(totalTime);
+        Message msg = handler.obtainMessage();
+        msg.what = TIME_INFO;
+        msg.obj = wlTimeInfoBean;
+        handler.sendMessage(msg);
     }
 
     /**
@@ -186,38 +286,40 @@ public class MusicPlayer {
      **/
     public void onCallComplete() {
         stop();
-        if (wlOnCompleteListener != null) {
-            wlOnCompleteListener.onComplete();
-        }
+        Message msg = handler.obtainMessage();
+        msg.what = COMPLETE;
+        handler.sendMessage(msg);
     }
 
     /**
      * 开始播放下一首的回调
      **/
     public void onCallNext() {
-        if (playNext) {
-            playNext = false;
-            prepare();
-        }
+        Message msg = handler.obtainMessage();
+        msg.what = ON_NEXT;
+        msg.obj = playNext;
+        handler.sendMessage(msg);
     }
 
     /**
      * 错误信息回调
      **/
-    public void onCallError(int code, String msg) {
-        if (wlOnErrorListener != null) {
-            stop();
-            wlOnErrorListener.onError(code, msg);
-        }
+    public void onCallError(int code, String message) {
+        Message msg = handler.obtainMessage();
+        msg.what = ERROR;
+        msg.arg1 = code;
+        msg.obj = message;
+        handler.sendMessage(msg);
     }
 
     /**
      * 声音大小回调
      **/
-    public void onCallValumeDB(int db) {
-        if (wlOnValumeDBListener != null) {
-            wlOnValumeDBListener.onDbValue(db);
-        }
+    public void onCallVolumeDB(int db) {
+        Message msg = handler.obtainMessage();
+        msg.what = SOUND;
+        msg.arg1 = db;
+        handler.sendMessage(msg);
     }
 
     /**
@@ -442,7 +544,7 @@ public class MusicPlayer {
     }
 
     /**
-     * 设置播放速度，1为征程
+     * 设置播放速度，1为正常
      **/
     public void setSpeed(float s) {
         speed = s;
