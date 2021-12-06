@@ -202,6 +202,8 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
             //开始执行播放逻辑，传入数据和数据大小
             (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer,
                                                 bufferSize);
+        } else{
+            wlAudio->clock = 0;
         }
     }
 }

@@ -166,9 +166,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void begin(View view) {
-        wlPlayer.updateFile(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/杞人忧天_标清.flv", "rtmp://192.168.3.98:1935/rtmplive/test");
-//        if (PermissionsUtils.getStorgePermission(this)) {
-//            isPlay = true;
+//        wlPlayer.updateFile(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/杞人忧天_标清.flv", "rtmp://192.168.3.98:1935/rtmplive/test");
+        if (PermissionsUtils.getStorgePermission(this)) {
+            isPlay = true;
 //            if (musicUrl.getText() != null && !TextUtils.isEmpty(musicUrl.getText().toString())) {
 //                wlPlayer.setSource(musicUrl.getText().toString());
 //            } else {
@@ -176,10 +176,10 @@ public class MainActivity extends AppCompatActivity {
 //                wlPlayer.playNext("http://vfx.mtime.cn/Video/2019/03/19/mp4/190319222227698228.mp4");
 //                wlPlayer.setSource("https://stream7.iqilu.com/10339/upload_transcode/202002/18/20200218114723HDu3hhxqIT.mp4");
 //                wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/泰坦尼克号.mkv");
-//                wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/WDNMD.mp4");
+                wlPlayer.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AFeel/WDNMD.mp4");
 //            }
-//            wlPlayer.prepare();
-//        }
+            wlPlayer.prepare();
+        }
     }
 
     private boolean hasPause = false;
