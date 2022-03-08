@@ -11,6 +11,9 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2953125" />
         <entry key="filmfactory/src/main/res/layout/activity_main.xml" value="0.2953125" />
         <entry key="filmfactory/src/main/res/layout/base_include_head.xml" value="0.2907692307692308" />
+        <entry key="livepusher/src/main/res/layout/activity_camera.xml" value="0.30564102564102563" />
+        <entry key="livepusher/src/main/res/layout/activity_video.xml" value="0.30564102564102563" />
+        <entry key="opengl/src/main/res/layout/activity_texture.xml" value="0.30564102564102563" />
       </map>
     </option>
   </component>
