@@ -4,6 +4,7 @@ apply plugin: 'realm-android'
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.1"
+    ndkVersion "23.1.7779620"
 
     defaultConfig {
         applicationId "com.simple.filmfactory"
