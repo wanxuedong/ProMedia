@@ -1,4 +1,4 @@
-rootProject.name='ProMusic'
+rootProject.name='ProMedia'
 include ':app', ':commondialog'
 include ':opengl'
 include ':livepusher'
