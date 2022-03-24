@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static int audioSampleRate = 16000;
 
     /**
-     * 音频格式：PCM编码
+     * 采样位数
      **/
     private static int audioEncoding = AudioFormat.ENCODING_PCM_8BIT;
 

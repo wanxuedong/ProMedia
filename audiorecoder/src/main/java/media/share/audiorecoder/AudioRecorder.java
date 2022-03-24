@@ -1,7 +1,5 @@
 package media.share.audiorecoder;
 
-import static android.media.AudioFormat.ENCODING_PCM_16BIT;
-
 import android.annotation.SuppressLint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -30,7 +28,7 @@ public class AudioRecorder implements Runnable {
     /**
      * 当前播放状态
      **/
-    private RecordState recordState;
+    private boolean isRecording;
 
     /**
      * 录制线程池
@@ -54,7 +52,7 @@ public class AudioRecorder implements Runnable {
     /**
      * 音频数据的声道数，1：单声道，2：双声道
      **/
-    public short channels = 1;
+    public short channels = AudioFormat.CHANNEL_IN_MONO;
 
     /**
      * 音频数据的采样率
@@ -64,21 +62,16 @@ public class AudioRecorder implements Runnable {
     /**
      * 音频数据的采样位数，16或8
      **/
-    public short audioFormat = 16;
+    public short audioFormat = AudioFormat.ENCODING_PCM_8BIT;
+
+    /**
+     * 录制的文件所在路径
+     **/
+    private String basePath = "sdcard/AAFileFactory/";
 
     public AudioRecorder() {
         recordExecutor = Executors.newSingleThreadExecutor();
-        String recorderName = System.currentTimeMillis() + "";
-        pcmFile = new File("sdcard/AAFileFactory/", recorderName + ".pcm");
-        wavFile = new File("sdcard/AAFileFactory/", recorderName + ".wav");
-        if (pcmFile.exists()) {
-            pcmFile.delete();
-        }
-        if (wavFile.exists()) {
-            wavFile.delete();
-        }
-
-        recordState = RecordState.IDLE;
+        isRecording = false;
     }
 
     /**
@@ -92,20 +85,30 @@ public class AudioRecorder implements Runnable {
     @SuppressLint("MissingPermission")
     public void initAudioRecord(int audioSource, int channels, int sampleRate, int audioFormat) {
         minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channels, audioFormat);
-        this.channels = (short) (channels == AudioFormat.CHANNEL_IN_MONO ? 2 : 1);
+        this.channels = (short) channels;
         this.sampleRate = (short) sampleRate;
-        this.audioFormat = (short) (audioFormat == ENCODING_PCM_16BIT ? 16 : 8);
+        this.audioFormat = (short) audioFormat;
         audioRecord = new AudioRecord(audioSource, sampleRate, channels, audioFormat, minBufferSize);
+        String recorderName = (channels == AudioFormat.CHANNEL_IN_MONO ? "单声道" : "双声道") + "_" + sampleRate + "_" +
+                (audioFormat == AudioFormat.ENCODING_PCM_8BIT ? "8位" : "16位") + "_" + System.currentTimeMillis();
+        pcmFile = new File(basePath, recorderName + ".pcm");
+        wavFile = new File(basePath, recorderName + ".wav");
+        if (pcmFile.exists()) {
+            pcmFile.delete();
+        }
+        if (wavFile.exists()) {
+            wavFile.delete();
+        }
     }
 
     /**
      * 开始录制
      **/
     public void startRecord() {
-        if (recordState != RecordState.IDLE) {
+        if (isRecording) {
             return;
         }
-        recordState = RecordState.RECORDING;
+        isRecording = true;
         recordExecutor.execute(this);
 
     }
@@ -114,7 +117,7 @@ public class AudioRecorder implements Runnable {
      * 停止录制
      **/
     public void stopRecord() {
-        recordState = RecordState.IDLE;
+        isRecording = false;
         audioRecord.stop();
     }
 
@@ -125,13 +128,14 @@ public class AudioRecorder implements Runnable {
         try {
             outputStream = new BufferedOutputStream(new FileOutputStream(pcmFile));
             byte[] data = new byte[minBufferSize];
-            while (recordState == RecordState.RECORDING) {
+            while (isRecording) {
                 int size = audioRecord.read(data, 0, minBufferSize);
                 outputStream.write(data, 0, size);
             }
             outputStream.flush();
             outputStream.close();
-            PcmToWavUtil.convert(pcmFile.getAbsolutePath(), wavFile.getAbsolutePath(), channels, sampleRate, audioFormat);
+            PcmCovWavUtil pcmCovWavUtil = new PcmCovWavUtil(pcmFile.getAbsolutePath(), wavFile.getAbsolutePath(), channels, sampleRate, audioFormat);
+            pcmCovWavUtil.convertWaveFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -140,8 +144,4 @@ public class AudioRecorder implements Runnable {
 
     }
 
-    enum RecordState {
-        IDLE,
-        RECORDING
-    }
 }
