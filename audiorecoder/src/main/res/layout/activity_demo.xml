@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".DemoActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="【通道数】"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <RadioGroup
+        android:id="@+id/channel_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/channel_one"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="单通道"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/channel_two"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="双通道"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="【采样率】"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <RadioGroup
+        android:id="@+id/sample_rate_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rate_one"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="16000"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/rate_two"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="22050"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/rate_three"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="44100"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/rate_four"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="48000"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="【采样位数】"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <RadioGroup
+        android:id="@+id/sample_bit_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/bit_one"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="8位"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <RadioButton
+            android:id="@+id/bit_two"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="16位"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/record_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="录制时长: 0s"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/audio_set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="30dp"
+        android:background="@color/black"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="开始录制"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+</LinearLayout>

@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
-    ndkVersion "23.1.7779620"
 
     defaultConfig {
         applicationId "com.simple.livepusher"
