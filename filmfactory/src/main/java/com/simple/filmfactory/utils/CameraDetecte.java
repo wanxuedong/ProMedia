@@ -10,10 +10,19 @@ import android.os.Message;
 
 import java.util.List;
 
-import static com.simple.filmfactory.utils.CameraConfig.AUTO_FOCUS_TIME;
-
+/**
+ * @author wan
+ * 创建日期：2022/08/04
+ * 描述：相机辅助工具类
+ */
 public class CameraDetecte {
 
+    /**
+     * 相机定时聚焦间隔
+     * 相机默认以打开的一瞬间距离物体的距离作为焦距，之后移动摄像头，因为没有自动聚焦功能，
+     * 所以过远或过近都会导致拍摄不清晰，所以需要调整聚焦时间，然后调用强制聚焦
+     **/
+    public static final int AUTO_FOCUS_TIME = 3000;
 
     /**
      * 检测设备是否含有摄像头
@@ -157,6 +166,7 @@ public class CameraDetecte {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+            isCamera = false;
             return false;
         }
     }

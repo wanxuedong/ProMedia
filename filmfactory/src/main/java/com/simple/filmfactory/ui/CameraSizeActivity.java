@@ -18,7 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 选择照片分辨率
+ * @author wan
+ * 创建日期：2022/08/04
+ * 描述：选择照片分辨率
+ *
+ * todo 当选择某些分辨率时，点击录像会崩溃，待处理
  **/
 public class CameraSizeActivity extends BaseActivity implements CallBack {
 

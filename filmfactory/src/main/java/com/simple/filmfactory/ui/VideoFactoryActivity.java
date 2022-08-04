@@ -6,10 +6,14 @@ import com.simple.filmfactory.R;
 import com.simple.filmfactory.databinding.ActivityVideoFactoryBinding;
 import com.simple.filmfactory.ui.base.BaseActivity;
 import com.simple.filmfactory.ui.filemanagement.FileManagementActivity;
+import com.simple.filmfactory.utils.CameraDetecte;
 import com.simple.filmfactory.utils.PermissionsUtils;
+import com.simple.filmfactory.utils.ToastUtil;
 
 /**
- * 视频加工
+ * @author wan
+ * 创建日期：2022/08/04
+ * 描述：图片视频处理示例
  **/
 public class VideoFactoryActivity extends BaseActivity {
 
@@ -41,10 +45,14 @@ public class VideoFactoryActivity extends BaseActivity {
                 break;
             case R.id.video_recording:
                 //录制视频
-                if (PermissionsUtils.getCameraPermission(this)) {
-                    if (PermissionsUtils.getStorgePermission(this)) {
-                        startActivity(CameraActivity.class);
+                if (CameraDetecte.hasCamera(this)) {
+                    if (PermissionsUtils.getCameraPermission(this)) {
+                        if (PermissionsUtils.getStorgePermission(this)) {
+                            startActivity(CameraActivity.class);
+                        }
                     }
+                } else {
+                    ToastUtil.show("当前设备无可用相机");
                 }
                 break;
             case R.id.video_crop:

@@ -77,6 +77,9 @@ public class WlCameraView extends BaseEGLSurfaceView {
         return wlCamera;
     }
 
+    /**
+     * 前后摄像头切换
+     * **/
     public void switchCamera() {
         if (wlCamera != null) {
             ThreadX.x().run(new AbstractLife() {

@@ -187,54 +187,6 @@ public class ImageUtil {
     private static final String FILES_NAME = "AACamera";
 
     /**
-     * 使用当前系统时间作为上传图片/视频的名称
-     *
-     * @param type 传video表示获取视频路径，传image表示获取图片路径
-     * @param name 传入视频/图片保存的名称，如果传null，默认以时间戳命名
-     * @return 存储的根路径+图片/视频名称
-     * todo 需要废弃
-     */
-    public static String getPhotoFileName(Context context, String type, String name) {
-        if (name == null || "".equals(name)) {
-            SimpleDateFormat format = new SimpleDateFormat(TIME_STYLE, Locale.getDefault());
-            Date date = new Date(System.currentTimeMillis());
-            switch (type) {
-                case "image":
-                    name = format.format(date) + IMAGE_TYPE;
-                    break;
-                case "video":
-                    name = format.format(date) + VIDEO_TYPE;
-                    break;
-            }
-        } else {
-            switch (type) {
-                case "image":
-                    name = name + IMAGE_TYPE;
-                    break;
-                case "video":
-                    name = name + VIDEO_TYPE;
-                    break;
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + FILES_NAME + File.separator);
-        // 判断文件是否已经存在，不存在则创建
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        File childFile = new File(file.getPath(), name);
-        //如果存在，就先删除再创建
-        if (childFile.exists()) {
-            childFile.delete();
-        }
-        try {
-            childFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return childFile.getAbsolutePath();
-    }
-
-    /**
      * 获取手机可存储路径
      *
      * @param context 上下文

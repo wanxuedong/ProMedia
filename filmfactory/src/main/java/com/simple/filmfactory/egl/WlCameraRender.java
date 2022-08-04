@@ -8,7 +8,7 @@ import android.opengl.Matrix;
 
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.egl.base.BaseEGLSurfaceView;
-import com.simple.filmfactory.egl.base.WlShaderUtil;
+import com.simple.filmfactory.egl.base.ShaderUtil;
 import com.simple.filmfactory.utils.DisplayUtil;
 import com.simple.filmfactory.utils.logutils.LogUtil;
 
@@ -100,10 +100,10 @@ public class WlCameraRender implements BaseEGLSurfaceView.WlGLRender, SurfaceTex
         //初始化fbo
         wlCameraFboRender.onCreate();
 
-        String vertexSource = WlShaderUtil.getRawResource(context, R.raw.vertex_shader);
-        String fragmentSource = WlShaderUtil.getRawResource(context, R.raw.fragment_shader);
+        String vertexSource = ShaderUtil.getRawResource(context, R.raw.vertex_shader);
+        String fragmentSource = ShaderUtil.getRawResource(context, R.raw.fragment_shader);
 
-        program = WlShaderUtil.createProgram(vertexSource, fragmentSource);
+        program = ShaderUtil.createProgram(vertexSource, fragmentSource);
         vPosition = GLES20.glGetAttribLocation(program, "v_Position");
         fPosition = GLES20.glGetAttribLocation(program, "f_Position");
         umatrix = GLES20.glGetUniformLocation(program, "u_Matrix");

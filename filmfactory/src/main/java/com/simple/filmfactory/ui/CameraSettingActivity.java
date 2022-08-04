@@ -14,7 +14,9 @@ import com.simple.filmfactory.utils.FileSaveUtil;
 import java.util.HashMap;
 
 /**
- * 相机参数设置页面
+ * @author wan
+ * 创建日期：2022/08/04
+ * 描述：相机参数设置页面
  **/
 public class CameraSettingActivity extends BaseActivity {
 
@@ -49,9 +51,9 @@ public class CameraSettingActivity extends BaseActivity {
             settingBinding.watermarkStatus.setImageResource(R.drawable.chose_not);
         }
         if (isBack) {
-            settingBinding.powerSize.setText(cameraSets.getPreviewWidth() + " x " + cameraSets.getPreviewHeight());
+            settingBinding.powerSize.setText(cameraSets.getPreviewHeight() + " x " + cameraSets.getPreviewWidth());
         } else {
-            settingBinding.powerSize.setText(cameraSets.getSelfieWidth() + " x " + cameraSets.getSelfieHeight());
+            settingBinding.powerSize.setText(cameraSets.getSelfieHeight() + " x " + cameraSets.getSelfieWidth());
         }
     }
 
@@ -106,7 +108,7 @@ public class CameraSettingActivity extends BaseActivity {
                 cameraSets.setSelfieWidth(previewWidth);
                 cameraSets.setSelfieHeight(previewHeight);
             }
-            settingBinding.powerSize.setText(previewWidth + " x " + previewHeight);
+            settingBinding.powerSize.setText(previewHeight + " x " + previewWidth);
             FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);
         }
     }

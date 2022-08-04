@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
 import com.simple.filmfactory.R;
-import com.simple.filmfactory.egl.base.WlShaderUtil;
+import com.simple.filmfactory.egl.base.ShaderUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -59,7 +59,7 @@ public class WlCameraFboRender {
     public WlCameraFboRender(Context context) {
         this.context = context;
 
-        bitmap = WlShaderUtil.createTextImage(context, "内涵段子tv", 50, "#ff0000", "#00000000", 0);
+        bitmap = ShaderUtil.createTextImage(context, "内涵段子tv", 50, "#ff0000", "#00000000", 0);
 
 
         float r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
@@ -97,10 +97,10 @@ public class WlCameraFboRender {
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-        String vertexSource = WlShaderUtil.getRawResource(context, R.raw.vertex_shader_screen);
-        String fragmentSource = WlShaderUtil.getRawResource(context, R.raw.fragment_shader_screen);
+        String vertexSource = ShaderUtil.getRawResource(context, R.raw.vertex_shader_screen);
+        String fragmentSource = ShaderUtil.getRawResource(context, R.raw.fragment_shader_screen);
 
-        program = WlShaderUtil.createProgram(vertexSource, fragmentSource);
+        program = ShaderUtil.createProgram(vertexSource, fragmentSource);
 
         vPosition = GLES20.glGetAttribLocation(program, "v_Position");
         fPosition = GLES20.glGetAttribLocation(program, "f_Position");
@@ -118,7 +118,7 @@ public class WlCameraFboRender {
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, fragmentData.length * 4, fragmentBuffer);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-        bitmapTextureid = WlShaderUtil.loadBitmapTexture(bitmap);
+        bitmapTextureid = ShaderUtil.loadBitmapTexture(bitmap);
     }
 
     private int width;

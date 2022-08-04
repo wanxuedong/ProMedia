@@ -30,7 +30,7 @@
                 android:background="@drawable/solid_blue"
                 android:gravity="center"
                 android:padding="15dp"
-                android:text="录制视频"
+                android:text="相机"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold" />

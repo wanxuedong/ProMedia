@@ -18,17 +18,24 @@ import com.simple.filmfactory.bean.CameraSets;
 import com.simple.filmfactory.databinding.ActivityCameraBinding;
 import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
 import com.simple.filmfactory.encodec.WlMediaEncodec;
+import com.simple.filmfactory.encodec.listener.OnMediaInfoListener;
+import com.simple.filmfactory.encodec.listener.OnStatusChangeListener;
 import com.simple.filmfactory.ui.base.BaseActivity;
 import com.simple.filmfactory.utils.CallBack;
 import com.simple.filmfactory.utils.CameraDetecte;
+import com.simple.filmfactory.utils.CameraViewHelper;
 import com.simple.filmfactory.utils.FileSaveUtil;
 import com.simple.filmfactory.utils.FileUtil;
 import com.simple.filmfactory.utils.ImageUtil;
-import com.simple.filmfactory.utils.WaterUtil;
+import com.simple.filmfactory.utils.WaterMarkUtil;
 import com.simple.filmfactory.utils.threadXUtil.AbstractLife;
 import com.simple.filmfactory.utils.threadXUtil.ThreadX;
 import com.simple.filmfactory.widget.lineview.GateView;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +43,9 @@ import java.util.List;
 import static com.simple.filmfactory.utils.FileCataLog.BASE_NAME;
 
 /**
- * 拍照或录制视频
- *
- * @author mac
+ * @author wan
+ * 创建日期：2022/08/04
+ * 描述：拍照或录制视频
  */
 public class CameraActivity extends BaseActivity implements GateView.OnNavigateLisenter {
 
@@ -73,9 +80,36 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
      **/
     private boolean isBack = true;
 
+    private PutPcmThread putPcmThread;
+
+    /**
+     * 当前录制的视频
+     * **/
+    private String currentVideo;
+
+    /**
+     * 拍照或录像的宽度分辨率
+     * **/
+    int cameraWidth = 720;
+
+    /**
+     * 拍照或录像的高度分辨率
+     * **/
+    int cameraHeight = 1280;
+
+    /**
+     * 是否开启了相机水印，默认不开启
+     * **/
+    private boolean isWaterOpen;
+
     @Override
     protected void init() {
         cameraBinding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
+    }
+
+    @Override
+    public void initView() {
+        super.initView();
     }
 
     @Override
@@ -85,6 +119,8 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         gateList.add("录像");
         cameraBinding.cameraGuide.setNavigation(gateList);
         cameraSets = (CameraSets) FileSaveUtil.readSerializable("camera_setting.txt");
+        refreshCameraSet();
+        CameraViewHelper.autoToSize(this, cameraBinding.cameraView, cameraHeight, cameraWidth);
     }
 
     @Override
@@ -116,10 +152,18 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                 Intent intent = new Intent();
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    intent.setType("image/*");
+                    if (isTakePhoto){
+                        intent.setType("image/*");
+                    }else {
+                        intent.setType("video/*");
+                    }
                 } else {
                     intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                    if (isTakePhoto) {
+                        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                    }else {
+                        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "video/*");
+                    }
                 }
                 startActivityForResult(intent, 1);
                 break;
@@ -137,6 +181,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
      * 开始拍照或者录制视频
      **/
     public void start() {
+        refreshCameraSet();
         if (isTakePhoto) {
             //当前处于拍照模式
             if (!isFocus) {
@@ -149,17 +194,17 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                             cameraBinding.cameraView.getWlCamera().getCamera().takePicture(null, null, new Camera.PictureCallback() {
                                 @Override
                                 public void onPictureTaken(final byte[] data, Camera camera) {
-                                    //需要注意的是，拍照后，预览界面会被卡住，如果需要恢复，需要调用下面代码强制刷新预览界面
+                                    //需要注意的是，拍照后，预览界面会被卡住，需要调用下面代码强制刷新预览界面
                                     cameraBinding.cameraView.getWlCamera().switchCamera(cameraBinding.cameraView.getWlCamera().isBack);
                                     ThreadX.x().run(new AbstractLife() {
                                         @Override
                                         public void run() {
                                             super.run();
-                                            //将图片展示在左下角
+                                            //图片添加水印
                                             Bitmap bitmap = ImageUtil.rotateBitmap(ImageUtil.Bytes2Bitmap(data), isBack ? 90 : -90);
                                             Bitmap waterMap = BitmapFactory.decodeResource(getResources(), R.mipmap.dipian, null);
-                                            if (cameraSets.isWaterOpen()) {
-                                                bitmap = WaterUtil.addWater(CameraActivity.this, bitmap, waterMap, "内涵段子tv", Gravity.RIGHT | Gravity.BOTTOM);
+                                            if (isWaterOpen) {
+                                                bitmap = WaterMarkUtil.addWater(CameraActivity.this, bitmap, waterMap, "内涵段子tv", Gravity.RIGHT | Gravity.BOTTOM);
                                             }
                                             final Bitmap finalBitmap = bitmap;
                                             runOnUiThread(new Runnable() {
@@ -194,12 +239,25 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                 //当前不在录像
                 if (wlMediaEncodec == null) {
                     wlMediaEncodec = new WlMediaEncodec(this, cameraBinding.cameraView.getTextureId());
-                    wlMediaEncodec.initEnCodec(cameraBinding.cameraView.getEglContext(),
-                            FileUtil.getPath(BASE_NAME, null, ".mp4"), MediaFormat.MIMETYPE_VIDEO_AVC,
-                            720, 1280);
-                    wlMediaEncodec.setOnMediaInfoListener(new WlBaseMediaEncoder.OnMediaInfoListener() {
+                    currentVideo = FileUtil.getPath(BASE_NAME, null, ".mp4");
+                    wlMediaEncodec.initEnCodec(cameraBinding.cameraView.getEglContext(),currentVideo
+                            , MediaFormat.MIMETYPE_VIDEO_AVC,
+                            cameraHeight, cameraWidth, 44100, 2, 16);
+                    wlMediaEncodec.setOnMediaInfoListener(new OnMediaInfoListener() {
                         @Override
                         public void onMediaTime(int times) {
+                        }
+                    });
+                    wlMediaEncodec.setOnStatusChangeListener(new OnStatusChangeListener() {
+                        @Override
+                        public void onStatusChange(OnStatusChangeListener.STATUS status) {
+                            if (status == OnStatusChangeListener.STATUS.START) {
+//                                putPcmThread = new PutPcmThread(new WeakReference<CameraActivity>(CameraActivity.this));
+//                                putPcmThread.start();
+                            }else if (status == OnStatusChangeListener.STATUS.END){
+                                //刷新录制完毕的视频到相册
+                                ImageUtil.refreshImage(CameraActivity.this, "", new File(currentVideo), "");
+                            }
                         }
                     });
                 }
@@ -210,6 +268,22 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                 isTakeVideo = true;
             }
         }
+    }
+
+    /**
+     * 刷新相机配置
+     * **/
+    private void refreshCameraSet() {
+        //刷新拍照或录像的分辨率
+        if (isBack){
+            cameraWidth = cameraSets.getPreviewWidth();
+            cameraHeight = cameraSets.getPreviewHeight();
+        }else {
+            cameraWidth = cameraSets.getSelfieWidth();
+            cameraHeight = cameraSets.getSelfieHeight();
+        }
+        //水印是否打开
+        isWaterOpen = cameraSets.isWaterOpen();
     }
 
     @Override
@@ -232,6 +306,8 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 10000) {
             cameraSets = (CameraSets) FileSaveUtil.readSerializable("camera_setting.txt");
+            refreshCameraSet();
+            CameraViewHelper.autoToSize(this, cameraBinding.cameraView, cameraHeight, cameraWidth);
         }
     }
 
@@ -245,5 +321,56 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
     protected void onDestroy() {
         super.onDestroy();
         cameraBinding.cameraView.onDestroy();
+    }
+
+    private static class PutPcmThread extends Thread {
+
+        private boolean isExit;
+        private WeakReference<CameraActivity> reference;
+
+        public PutPcmThread(WeakReference<CameraActivity> reference) {
+            this.reference = reference;
+        }
+
+        public void setExit(boolean exit) {
+            isExit = exit;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            isExit = false;
+            InputStream inputStream = null;
+            try {
+                int s_ = 44100 * 2 * (16 / 2);
+                int bufferSize = s_ / 100;
+
+                inputStream = reference.get().getAssets().open("mydream.pcm");
+                byte[] buffer = new byte[bufferSize];
+                int size = 0;
+                while ((size = inputStream.read(buffer, 0, bufferSize)) != -1) {
+                    try {
+                        // 10毫秒写入一次
+                        Thread.sleep(1000 / 100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (reference.get().wlMediaEncodec == null || isExit) {
+                        break;
+                    }
+                    reference.get().wlMediaEncodec.putPcmData(buffer, size, true);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

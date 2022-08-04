@@ -115,7 +115,7 @@ public class WlCamera {
             camera.startPreview();
             cameraDetecte.autoFocus(camera);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
