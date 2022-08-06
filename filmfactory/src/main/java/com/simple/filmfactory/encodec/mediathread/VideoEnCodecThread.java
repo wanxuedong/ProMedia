@@ -25,7 +25,7 @@ public class VideoEnCodecThread extends Thread {
     private MediaMuxer mediaMuxer;
 
     private int videoTrackIndex;
-    private long pts;
+    private long prevOutputPTSUs = 0;
 
 
     public VideoEnCodecThread(WeakReference<WlBaseMediaEncoder> encoderWeakReference) {
@@ -39,7 +39,6 @@ public class VideoEnCodecThread extends Thread {
     @Override
     public void run() {
         super.run();
-        pts = 0;
         videoTrackIndex = -1;
         isExit = false;
         videoWeakReference.get().videoExit = false;
@@ -82,16 +81,14 @@ public class VideoEnCodecThread extends Thread {
                     outputBuffer.position(videoBufferinfo.offset);
                     outputBuffer.limit(videoBufferinfo.offset + videoBufferinfo.size);
 
-                    if (pts == 0) {
-                        pts = videoBufferinfo.presentationTimeUs;
-                    }
-                    videoBufferinfo.presentationTimeUs = videoBufferinfo.presentationTimeUs - pts;
-
+                    //设置时间戳
+                    videoBufferinfo.presentationTimeUs = getPTSUs();
                     mediaMuxer.writeSampleData(videoTrackIndex, outputBuffer, videoBufferinfo);
                     if (videoWeakReference.get().onMediaInfoListener != null) {
                         videoWeakReference.get().onMediaInfoListener.onMediaTime((int) (videoBufferinfo.presentationTimeUs / 1000000));
                     }
 
+                    prevOutputPTSUs = videoBufferinfo.presentationTimeUs;
                     videoEncodec.releaseOutputBuffer(outputBufferIndex, false);
                     outputBufferIndex = videoEncodec.dequeueOutputBuffer(videoBufferinfo, 0);
                 }
@@ -99,7 +96,22 @@ public class VideoEnCodecThread extends Thread {
         }
 
     }
+    /**
+     * 获取下一个时间戳
+     *
+     * @return
+     */
+    private long getPTSUs() {
+        long result = System.nanoTime() / 1000L;
+        if (result < prevOutputPTSUs) {
+            result += (prevOutputPTSUs - result);
+        }
+        return result;
+    }
 
+    /**
+     * 退出录制和合成
+     **/
     public void exit() {
         isExit = true;
         videoWeakReference.get().videoExit = true;

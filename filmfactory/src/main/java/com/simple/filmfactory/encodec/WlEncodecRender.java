@@ -7,12 +7,13 @@ import android.opengl.GLES20;
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.egl.base.BaseEGLSurfaceView;
 import com.simple.filmfactory.egl.base.ShaderUtil;
+import com.simple.filmfactory.egl.listener.GLRender;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-public class WlEncodecRender implements BaseEGLSurfaceView.WlGLRender {
+public class WlEncodecRender implements GLRender {
 
     private Context context;
 

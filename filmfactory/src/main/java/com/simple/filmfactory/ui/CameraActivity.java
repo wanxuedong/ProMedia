@@ -252,6 +252,10 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                         @Override
                         public void onStatusChange(OnStatusChangeListener.STATUS status) {
                             if (status == OnStatusChangeListener.STATUS.START) {
+                                //启动并显示计时器
+                                cameraBinding.cameraTime.start();
+                                cameraBinding.cameraTime.setVisibility(View.VISIBLE);
+                                isTakeVideo = true;
 //                                putPcmThread = new PutPcmThread(new WeakReference<CameraActivity>(CameraActivity.this));
 //                                putPcmThread.start();
                             }else if (status == OnStatusChangeListener.STATUS.END){
@@ -262,10 +266,6 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                     });
                 }
                 wlMediaEncodec.startRecord();
-                //启动并显示计时器
-                cameraBinding.cameraTime.start();
-                cameraBinding.cameraTime.setVisibility(View.VISIBLE);
-                isTakeVideo = true;
             }
         }
     }

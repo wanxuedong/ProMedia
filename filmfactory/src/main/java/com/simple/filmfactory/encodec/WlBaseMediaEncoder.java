@@ -8,6 +8,7 @@ import android.media.MediaMuxer;
 import android.view.Surface;
 
 import com.simple.filmfactory.egl.base.BaseEGLSurfaceView;
+import com.simple.filmfactory.egl.listener.GLRender;
 import com.simple.filmfactory.encodec.listener.OnMediaInfoListener;
 import com.simple.filmfactory.encodec.listener.OnStatusChangeListener;
 import com.simple.filmfactory.encodec.mediathread.AudioEnCodecThread;
@@ -62,7 +63,7 @@ public abstract class WlBaseMediaEncoder {
     public boolean videoExit;
 
 
-    public BaseEGLSurfaceView.WlGLRender wlGLRender;
+    public GLRender wlGLRender;
 
     public OnMediaInfoListener onMediaInfoListener;
 
@@ -94,7 +95,7 @@ public abstract class WlBaseMediaEncoder {
     public WlBaseMediaEncoder(Context context) {
     }
 
-    public void setRender(BaseEGLSurfaceView.WlGLRender wlGLRender) {
+    public void setRender(GLRender wlGLRender) {
         this.wlGLRender = wlGLRender;
     }
 
@@ -220,14 +221,17 @@ public abstract class WlBaseMediaEncoder {
      **/
     private void initAudioEncoder(String mineType, int sampleRate, int channel) {
         try {
+            mAudioBuffInfo = new MediaCodec.BufferInfo();
+
             audioEncodec = MediaCodec.createEncoderByType(mineType);
             MediaFormat audioFormat = MediaFormat.createAudioFormat(mineType, sampleRate, channel);
-            audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);
+            audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
             audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
             audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096);
+            audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
+            audioFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, 44100);
             audioEncodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
 
-            mAudioBuffInfo = new MediaCodec.BufferInfo();
         } catch (IOException e) {
             e.printStackTrace();
             audioEncodec = null;

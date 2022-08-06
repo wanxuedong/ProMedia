@@ -1,10 +1,9 @@
 package com.simple.filmfactory.utils;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.RelativeLayout;
 
-import com.simple.filmfactory.egl.WlCameraView;
+import com.simple.filmfactory.egl.CameraView;
 
 /**
  * @author wan
@@ -22,7 +21,7 @@ public class CameraViewHelper {
      * @param selectWidth  设置的视图宽度
      * @param selectHeight 设置的视图高度
      **/
-    public static void autoToSize(Context context, WlCameraView cameraView, int selectWidth, int selectHeight) {
+    public static void autoToSize(Context context, CameraView cameraView, int selectWidth, int selectHeight) {
         if (context == null) {
             return;
         }

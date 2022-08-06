@@ -48,7 +48,9 @@ public class VideoFactoryActivity extends BaseActivity {
                 if (CameraDetecte.hasCamera(this)) {
                     if (PermissionsUtils.getCameraPermission(this)) {
                         if (PermissionsUtils.getStorgePermission(this)) {
-                            startActivity(CameraActivity.class);
+                            if (PermissionsUtils.getRecordPermission(this)) {
+                                startActivity(CameraActivity.class);
+                            }
                         }
                     }
                 } else {

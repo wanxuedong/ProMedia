@@ -1,7 +1,5 @@
 package com.simple.filmfactory.encodec.listener;
 
-import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
-
 /**
  * @author wan
  * 创建日期：2022/08/05
