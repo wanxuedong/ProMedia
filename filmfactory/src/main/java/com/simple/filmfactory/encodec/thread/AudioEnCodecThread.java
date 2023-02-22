@@ -1,4 +1,4 @@
-package com.simple.filmfactory.encodec.mediathread;
+package com.simple.filmfactory.encodec.thread;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -7,7 +7,7 @@ import android.media.MediaMuxer;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
+import com.simple.filmfactory.encodec.BaseMediaEnCoder;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
  * 描述：音频录制线程
  */
 public class AudioEnCodecThread extends Thread {
-    private WeakReference<WlBaseMediaEncoder> audioWeakReference;
+    private WeakReference<BaseMediaEnCoder> audioWeakReference;
     public boolean isExit;
 
     public static final int SAMPLES_PER_FRAME = 1024;
@@ -36,11 +36,13 @@ public class AudioEnCodecThread extends Thread {
     private AudioRecord audioRecord;
     private long prevOutputPTSUs = 0;
 
-    public AudioEnCodecThread(WeakReference<WlBaseMediaEncoder> encoderWeakReference) {
+    public AudioEnCodecThread(WeakReference<BaseMediaEnCoder> encoderWeakReference) {
         this.audioWeakReference = encoderWeakReference;
-        audioEncodec = audioWeakReference.get().audioEncodec;
-        audioBufferinfo = audioWeakReference.get().mAudioBuffInfo;
-        mediaMuxer = audioWeakReference.get().mediaMuxer;
+        if (audioWeakReference.get() != null) {
+            audioEncodec = audioWeakReference.get().audioEncodec;
+            audioBufferinfo = audioWeakReference.get().mAudioBuffInfo;
+            mediaMuxer = audioWeakReference.get().mediaMuxer;
+        }
         audioTrackIndex = -1;
     }
 
@@ -49,7 +51,9 @@ public class AudioEnCodecThread extends Thread {
     public void run() {
         super.run();
         isExit = false;
-        audioWeakReference.get().audioExit = false;
+        if (audioWeakReference.get() != null) {
+            audioWeakReference.get().audioExit = false;
+        }
         audioEncodec.start();
         final ByteBuffer buf = ByteBuffer.allocateDirect(SAMPLES_PER_FRAME);
         int readBytes;
@@ -70,9 +74,11 @@ public class AudioEnCodecThread extends Thread {
                 audioEncodec = null;
 
                 //如果audio退出了
-                if (audioWeakReference.get().audioExit) {
-                    if (audioWeakReference.get().stopDownLatch != null) {
-                        audioWeakReference.get().stopDownLatch.countDown();
+                if (audioWeakReference.get() != null) {
+                    if (audioWeakReference.get().audioExit) {
+                        if (audioWeakReference.get().stopDownLatch != null) {
+                            audioWeakReference.get().stopDownLatch.countDown();
+                        }
                     }
                 }
                 break;
@@ -132,16 +138,18 @@ public class AudioEnCodecThread extends Thread {
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 audioTrackIndex = mediaMuxer.addTrack(audioEncodec.getOutputFormat());
-                if (audioWeakReference.get().startDownLatch != null) {
-                    audioWeakReference.get().startDownLatch.countDown();
-                }
-                try {
-                    //等待视频合成准备好
-                    if (audioWeakReference.get().audioDownLatch != null) {
-                        audioWeakReference.get().audioDownLatch.await();
+                if (audioWeakReference.get() != null) {
+                    if (audioWeakReference.get().startDownLatch != null) {
+                        audioWeakReference.get().startDownLatch.countDown();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        //等待视频合成准备好
+                        if (audioWeakReference.get().audioDownLatch != null) {
+                            audioWeakReference.get().audioDownLatch.await();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 encoderOutputBuffers = audioEncodec.getOutputBuffers();
@@ -150,7 +158,7 @@ public class AudioEnCodecThread extends Thread {
                     audioBufferinfo.size = 0;
                 }
 
-                if (audioBufferinfo.size != 0){
+                if (audioBufferinfo.size != 0) {
                     ByteBuffer outputBuffer = encoderOutputBuffers[encoderStatus];
                     outputBuffer.position(audioBufferinfo.offset);
                     outputBuffer.limit(audioBufferinfo.offset + audioBufferinfo.size);
@@ -225,6 +233,8 @@ public class AudioEnCodecThread extends Thread {
      **/
     public void exit() {
         isExit = true;
-        audioWeakReference.get().audioExit = true;
+        if (audioWeakReference.get() != null) {
+            audioWeakReference.get().audioExit = true;
+        }
     }
 }

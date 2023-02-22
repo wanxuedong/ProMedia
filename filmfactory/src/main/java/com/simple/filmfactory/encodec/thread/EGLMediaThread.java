@@ -1,10 +1,10 @@
-package com.simple.filmfactory.encodec.mediathread;
+package com.simple.filmfactory.encodec.thread;
 
-import static com.simple.filmfactory.encodec.WlBaseMediaEncoder.RENDERMODE_CONTINUOUSLY;
-import static com.simple.filmfactory.encodec.WlBaseMediaEncoder.RENDERMODE_WHEN_DIRTY;
+import static com.simple.filmfactory.encodec.BaseMediaEnCoder.RENDERMODE_CONTINUOUSLY;
+import static com.simple.filmfactory.encodec.BaseMediaEnCoder.RENDERMODE_WHEN_DIRTY;
 
 import com.simple.filmfactory.egl.base.EglHelper;
-import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
+import com.simple.filmfactory.encodec.BaseMediaEnCoder;
 
 import java.lang.ref.WeakReference;
 
@@ -15,7 +15,7 @@ import java.lang.ref.WeakReference;
  */
 public class EGLMediaThread extends Thread {
 
-    private WeakReference<WlBaseMediaEncoder> encoder;
+    private WeakReference<BaseMediaEnCoder> encoder;
     private EglHelper eglHelper;
     private Object object;
 
@@ -24,7 +24,7 @@ public class EGLMediaThread extends Thread {
     public boolean isChange = false;
     private boolean isStart = false;
 
-    public EGLMediaThread(WeakReference<WlBaseMediaEncoder> encoder) {
+    public EGLMediaThread(WeakReference<BaseMediaEnCoder> encoder) {
         this.encoder = encoder;
     }
 
@@ -71,24 +71,24 @@ public class EGLMediaThread extends Thread {
     }
 
     private void onCreate() {
-        if (isCreate && encoder.get().wlGLRender != null) {
+        if (isCreate && encoder.get().glRender != null) {
             isCreate = false;
-            encoder.get().wlGLRender.onSurfaceCreated();
+            encoder.get().glRender.onSurfaceCreated();
         }
     }
 
     private void onChange(int width, int height) {
-        if (isChange && encoder.get().wlGLRender != null) {
+        if (isChange && encoder.get().glRender != null) {
             isChange = false;
-            encoder.get().wlGLRender.onSurfaceChanged(width, height);
+            encoder.get().glRender.onSurfaceChanged(width, height);
         }
     }
 
     private void onDraw() {
-        if (encoder.get().wlGLRender != null && eglHelper != null) {
-            encoder.get().wlGLRender.onDrawFrame();
+        if (encoder.get().glRender != null && eglHelper != null) {
+            encoder.get().glRender.onDrawFrame();
             if (!isStart) {
-                encoder.get().wlGLRender.onDrawFrame();
+                encoder.get().glRender.onDrawFrame();
             }
             eglHelper.swapBuffers();
 

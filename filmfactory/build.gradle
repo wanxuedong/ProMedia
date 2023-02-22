@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.1"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.simple.filmfactory"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -37,6 +37,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.android.support:recyclerview-v7:29.0.0'
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.42'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.28'
     implementation project(path: ':commondialog')
 }

@@ -1,6 +1,6 @@
-package com.simple.filmfactory.encodec.mediathread;
+package com.simple.filmfactory.encodec.thread;
 
-import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
+import com.simple.filmfactory.encodec.BaseMediaEnCoder;
 import com.simple.filmfactory.encodec.listener.OnStatusChangeListener;
 
 import java.lang.ref.WeakReference;
@@ -12,9 +12,9 @@ import java.lang.ref.WeakReference;
  */
 public class MediaMuxerThread extends Thread{
 
-    private WeakReference<WlBaseMediaEncoder> encoderWeakReference;
+    private WeakReference<BaseMediaEnCoder> encoderWeakReference;
 
-    public MediaMuxerThread(WeakReference<WlBaseMediaEncoder> encoderWeakReference) {
+    public MediaMuxerThread(WeakReference<BaseMediaEnCoder> encoderWeakReference) {
         this.encoderWeakReference = encoderWeakReference;
     }
 
@@ -30,7 +30,7 @@ public class MediaMuxerThread extends Thread{
      *
      * @param mediaWeakReference 当前录制合成器
      **/
-    private static synchronized void startMuxer(WeakReference<WlBaseMediaEncoder> mediaWeakReference) {
+    private static synchronized void startMuxer(WeakReference<BaseMediaEnCoder> mediaWeakReference) {
         if (mediaWeakReference.get().mediaMuxer == null) {
             return;
         }
@@ -58,7 +58,7 @@ public class MediaMuxerThread extends Thread{
      *
      * @param mediaWeakReference 当前录制合成器
      **/
-    private static synchronized void quitMuxer(WeakReference<WlBaseMediaEncoder> mediaWeakReference) {
+    private static synchronized void quitMuxer(WeakReference<BaseMediaEnCoder> mediaWeakReference) {
         if (mediaWeakReference.get().mediaMuxer == null) {
             return;
         }

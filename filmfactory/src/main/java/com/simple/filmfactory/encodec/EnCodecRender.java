@@ -13,7 +13,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-public class WlEncodecRender implements GLRender {
+/**
+ * @author wan
+ * 创建日期：2022/08/04
+ * 相机录制渲染层，为了和相机预览分离处理
+ * **/
+public class EnCodecRender implements GLRender {
 
     private Context context;
 
@@ -48,7 +53,7 @@ public class WlEncodecRender implements GLRender {
     private Bitmap bitmap;
     private int bitmapTextureid;
 
-    public WlEncodecRender(Context context, int textureid) {
+    public EnCodecRender(Context context, int textureid) {
         this.context = context;
         this.textureid = textureid;
 

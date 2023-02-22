@@ -14,6 +14,8 @@ import java.lang.ref.WeakReference;
 import javax.microedition.khronos.egl.EGLContext;
 
 /**
+ * @author wan
+ * 创建日期：2022/08/04
  * 自定义的SurfaceView
  * 创建EGL环境并设置回调，完成普通SurfaceView无法完成多屏渲染和更多处理
  **/

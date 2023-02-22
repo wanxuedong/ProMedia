@@ -7,14 +7,13 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.view.Surface;
 
-import com.simple.filmfactory.egl.base.BaseEGLSurfaceView;
 import com.simple.filmfactory.egl.listener.GLRender;
 import com.simple.filmfactory.encodec.listener.OnMediaInfoListener;
 import com.simple.filmfactory.encodec.listener.OnStatusChangeListener;
-import com.simple.filmfactory.encodec.mediathread.AudioEnCodecThread;
-import com.simple.filmfactory.encodec.mediathread.MediaMuxerThread;
-import com.simple.filmfactory.encodec.mediathread.VideoEnCodecThread;
-import com.simple.filmfactory.encodec.mediathread.EGLMediaThread;
+import com.simple.filmfactory.encodec.thread.AudioEnCodecThread;
+import com.simple.filmfactory.encodec.thread.MediaMuxerThread;
+import com.simple.filmfactory.encodec.thread.VideoEnCodecThread;
+import com.simple.filmfactory.encodec.thread.EGLMediaThread;
 import com.simple.filmfactory.utils.logutils.LogUtil;
 
 import java.io.IOException;
@@ -30,7 +29,7 @@ import javax.microedition.khronos.egl.EGLContext;
  * 需要注意的是功能基本上和BaseEGLSurfaceView一样，是为了保证预览和录制的一致性
  * 但同时也可以分别操作，并且录制时，启动编码线程
  **/
-public abstract class WlBaseMediaEncoder {
+public abstract class BaseMediaEnCoder {
 
     public final static int RENDERMODE_WHEN_DIRTY = 0;
     public final static int RENDERMODE_CONTINUOUSLY = 1;
@@ -62,8 +61,7 @@ public abstract class WlBaseMediaEncoder {
     public boolean audioExit;
     public boolean videoExit;
 
-
-    public GLRender wlGLRender;
+    public GLRender glRender;
 
     public OnMediaInfoListener onMediaInfoListener;
 
@@ -92,15 +90,15 @@ public abstract class WlBaseMediaEncoder {
      **/
     public OnStatusChangeListener onStatusChangeListener;
 
-    public WlBaseMediaEncoder(Context context) {
+    public BaseMediaEnCoder(Context context) {
     }
 
     public void setRender(GLRender wlGLRender) {
-        this.wlGLRender = wlGLRender;
+        this.glRender = wlGLRender;
     }
 
     public void setmRenderMode(int mRenderMode) {
-        if (wlGLRender == null) {
+        if (glRender == null) {
             throw new RuntimeException("must set render before");
         }
         this.mRenderMode = mRenderMode;
@@ -121,9 +119,9 @@ public abstract class WlBaseMediaEncoder {
      **/
     public void startRecord() {
         if (surface != null && eglContext != null) {
-            EGLMediaThread = new EGLMediaThread(new WeakReference<WlBaseMediaEncoder>(this));
-            mediaMuxerThread = new MediaMuxerThread(new WeakReference<WlBaseMediaEncoder>(this));
-            videoEncodecThread = new VideoEnCodecThread(new WeakReference<WlBaseMediaEncoder>(this));
+            EGLMediaThread = new EGLMediaThread(new WeakReference<BaseMediaEnCoder>(this));
+            mediaMuxerThread = new MediaMuxerThread(new WeakReference<BaseMediaEnCoder>(this));
+            videoEncodecThread = new VideoEnCodecThread(new WeakReference<BaseMediaEnCoder>(this));
             audioEnCodecThread = new AudioEnCodecThread(new WeakReference<>(this));
 
             EGLMediaThread.isCreate = true;

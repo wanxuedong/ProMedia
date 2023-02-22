@@ -16,8 +16,7 @@ import androidx.databinding.DataBindingUtil;
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.bean.CameraSets;
 import com.simple.filmfactory.databinding.ActivityCameraBinding;
-import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
-import com.simple.filmfactory.encodec.WlMediaEncodec;
+import com.simple.filmfactory.encodec.MediaEnCodec;
 import com.simple.filmfactory.encodec.listener.OnMediaInfoListener;
 import com.simple.filmfactory.encodec.listener.OnStatusChangeListener;
 import com.simple.filmfactory.ui.base.BaseActivity;
@@ -73,7 +72,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
      **/
     private boolean isTakeVideo = false;
 
-    private WlMediaEncodec wlMediaEncodec;
+    private MediaEnCodec wlMediaEnCodec;
 
     /**
      * 是否使用的是反面摄像头
@@ -229,26 +228,26 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
             //当前处于录像模式
             if (isTakeVideo) {
                 //当前正在录像
-                wlMediaEncodec.stopRecord();
-                wlMediaEncodec = null;
+                wlMediaEnCodec.stopRecord();
+                wlMediaEnCodec = null;
                 //停止并隐藏计时器
                 cameraBinding.cameraTime.stop();
                 cameraBinding.cameraTime.setVisibility(View.GONE);
                 isTakeVideo = false;
             } else {
                 //当前不在录像
-                if (wlMediaEncodec == null) {
-                    wlMediaEncodec = new WlMediaEncodec(this, cameraBinding.cameraView.getTextureId());
+                if (wlMediaEnCodec == null) {
+                    wlMediaEnCodec = new MediaEnCodec(this, cameraBinding.cameraView.getTextureId());
                     currentVideo = FileUtil.getPath(BASE_NAME, null, ".mp4");
-                    wlMediaEncodec.initEnCodec(cameraBinding.cameraView.getEglContext(),currentVideo
+                    wlMediaEnCodec.initEnCodec(cameraBinding.cameraView.getEglContext(),currentVideo
                             , MediaFormat.MIMETYPE_VIDEO_AVC,
                             cameraHeight, cameraWidth, 44100, 2, 16);
-                    wlMediaEncodec.setOnMediaInfoListener(new OnMediaInfoListener() {
+                    wlMediaEnCodec.setOnMediaInfoListener(new OnMediaInfoListener() {
                         @Override
                         public void onMediaTime(int times) {
                         }
                     });
-                    wlMediaEncodec.setOnStatusChangeListener(new OnStatusChangeListener() {
+                    wlMediaEnCodec.setOnStatusChangeListener(new OnStatusChangeListener() {
                         @Override
                         public void onStatusChange(OnStatusChangeListener.STATUS status) {
                             if (status == OnStatusChangeListener.STATUS.START) {
@@ -265,7 +264,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                         }
                     });
                 }
-                wlMediaEncodec.startRecord();
+                wlMediaEnCodec.startRecord();
             }
         }
     }
@@ -275,6 +274,9 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
      * **/
     private void refreshCameraSet() {
         //刷新拍照或录像的分辨率
+        if (cameraSets == null){
+            return;
+        }
         if (isBack){
             cameraWidth = cameraSets.getPreviewWidth();
             cameraHeight = cameraSets.getPreviewHeight();
@@ -355,10 +357,10 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (reference.get().wlMediaEncodec == null || isExit) {
+                    if (reference.get().wlMediaEnCodec == null || isExit) {
                         break;
                     }
-                    reference.get().wlMediaEncodec.putPcmData(buffer, size, true);
+                    reference.get().wlMediaEnCodec.putPcmData(buffer, size, true);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

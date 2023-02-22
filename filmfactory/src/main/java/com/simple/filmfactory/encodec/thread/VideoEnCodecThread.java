@@ -1,10 +1,10 @@
-package com.simple.filmfactory.encodec.mediathread;
+package com.simple.filmfactory.encodec.thread;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 
-import com.simple.filmfactory.encodec.WlBaseMediaEncoder;
+import com.simple.filmfactory.encodec.BaseMediaEnCoder;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
  * 描述：视频录制线程
  */
 public class VideoEnCodecThread extends Thread {
-    private WeakReference<WlBaseMediaEncoder> videoWeakReference;
+    private WeakReference<BaseMediaEnCoder> videoWeakReference;
 
     private boolean isExit;
 
@@ -28,12 +28,15 @@ public class VideoEnCodecThread extends Thread {
     private long prevOutputPTSUs = 0;
 
 
-    public VideoEnCodecThread(WeakReference<WlBaseMediaEncoder> encoderWeakReference) {
+    public VideoEnCodecThread(WeakReference<BaseMediaEnCoder> encoderWeakReference) {
         this.videoWeakReference = encoderWeakReference;
-        videoEncodec = videoWeakReference.get().videoEncodec;
-        videoFormat = videoWeakReference.get().videoFormat;
-        videoBufferinfo = videoWeakReference.get().videoBufferinfo;
-        mediaMuxer = videoWeakReference.get().mediaMuxer;
+        if (videoWeakReference.get() != null) {
+            videoEncodec = videoWeakReference.get().videoEncodec;
+            videoFormat = videoWeakReference.get().videoFormat;
+            videoBufferinfo = videoWeakReference.get().videoBufferinfo;
+            mediaMuxer = videoWeakReference.get().mediaMuxer;
+        }
+        videoTrackIndex = -1;
     }
 
     @Override
@@ -41,7 +44,9 @@ public class VideoEnCodecThread extends Thread {
         super.run();
         videoTrackIndex = -1;
         isExit = false;
-        videoWeakReference.get().videoExit = false;
+        if (videoWeakReference.get() != null) {
+            videoWeakReference.get().videoExit = false;
+        }
         videoEncodec.start();
         while (true) {
             if (isExit) {
@@ -51,9 +56,11 @@ public class VideoEnCodecThread extends Thread {
                 videoEncodec = null;
 
                 //如果video退出了
-                if (videoWeakReference.get().videoExit) {
-                    if (videoWeakReference.get().stopDownLatch != null) {
-                        videoWeakReference.get().stopDownLatch.countDown();
+                if (videoWeakReference.get() != null) {
+                    if (videoWeakReference.get().videoExit) {
+                        if (videoWeakReference.get().stopDownLatch != null) {
+                            videoWeakReference.get().stopDownLatch.countDown();
+                        }
                     }
                 }
                 break;
@@ -64,16 +71,18 @@ public class VideoEnCodecThread extends Thread {
 
             if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 videoTrackIndex = mediaMuxer.addTrack(videoEncodec.getOutputFormat());
-                if (videoWeakReference.get().startDownLatch != null) {
-                    videoWeakReference.get().startDownLatch.countDown();
-                }
-                try {
-                    //等待音频合成准备好
-                    if (videoWeakReference.get().videoDownLatch != null) {
-                        videoWeakReference.get().videoDownLatch.await();
+                if (videoWeakReference.get() != null) {
+                    if (videoWeakReference.get().startDownLatch != null) {
+                        videoWeakReference.get().startDownLatch.countDown();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        //等待音频合成准备好
+                        if (videoWeakReference.get().videoDownLatch != null) {
+                            videoWeakReference.get().videoDownLatch.await();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             } else {
                 while (outputBufferIndex >= 0) {
@@ -84,8 +93,10 @@ public class VideoEnCodecThread extends Thread {
                     //设置时间戳
                     videoBufferinfo.presentationTimeUs = getPTSUs();
                     mediaMuxer.writeSampleData(videoTrackIndex, outputBuffer, videoBufferinfo);
-                    if (videoWeakReference.get().onMediaInfoListener != null) {
-                        videoWeakReference.get().onMediaInfoListener.onMediaTime((int) (videoBufferinfo.presentationTimeUs / 1000000));
+                    if (videoWeakReference.get() != null) {
+                        if (videoWeakReference.get().onMediaInfoListener != null) {
+                            videoWeakReference.get().onMediaInfoListener.onMediaTime((int) (videoBufferinfo.presentationTimeUs / 1000000));
+                        }
                     }
 
                     prevOutputPTSUs = videoBufferinfo.presentationTimeUs;
@@ -96,6 +107,7 @@ public class VideoEnCodecThread extends Thread {
         }
 
     }
+
     /**
      * 获取下一个时间戳
      *
@@ -114,7 +126,9 @@ public class VideoEnCodecThread extends Thread {
      **/
     public void exit() {
         isExit = true;
-        videoWeakReference.get().videoExit = true;
+        if (videoWeakReference.get() != null) {
+            videoWeakReference.get().videoExit = true;
+        }
     }
 
 }

@@ -11,7 +11,11 @@ import com.simple.filmfactory.egl.listener.OnSurfaceCreateListener;
 import com.simple.filmfactory.utils.threadXUtil.AbstractLife;
 import com.simple.filmfactory.utils.threadXUtil.ThreadX;
 
-
+/**
+ * @author wan
+ * 创建日期：2022/08/04
+ * 描述：相机视图，通过独立的渲染层实现
+ */
 public class CameraView extends BaseEGLSurfaceView {
 
     private CameraRender wlCameraRender;
