@@ -6,6 +6,7 @@ import android.opengl.GLES20;
 
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.egl.base.ShaderUtil;
+import com.simple.filmfactory.utils.WaterMarkSetting;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -162,17 +163,20 @@ public class CameraFboRender {
 
 
         //绘制bitmap水印
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, bitmapTextureid);
-        GLES20.glEnableVertexAttribArray(vPosition);
-        //这里的32指的是使用后面的4个顶点坐标来绘制水印
-        GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 2 * 4,
-                32);
-        GLES20.glEnableVertexAttribArray(fPosition);
-        GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 2 * 4,
-                vertexData.length * 4);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        if (WaterMarkSetting.getInstant().isWaterMark()){
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, bitmapTextureid);
+            GLES20.glEnableVertexAttribArray(vPosition);
+            //这里的32指的是使用后面的4个顶点坐标来绘制水印
+            GLES20.glVertexAttribPointer(vPosition, 2, GLES20.GL_FLOAT, false, 2 * 4,
+                    32);
+            GLES20.glEnableVertexAttribArray(fPosition);
+            GLES20.glVertexAttribPointer(fPosition, 2, GLES20.GL_FLOAT, false, 2 * 4,
+                    vertexData.length * 4);
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        }
     }
+
 }

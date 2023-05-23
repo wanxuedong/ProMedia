@@ -9,6 +9,7 @@ import com.simple.filmfactory.bean.CameraSets;
 import com.simple.filmfactory.databinding.ActivityCameraSettingBinding;
 import com.simple.filmfactory.ui.base.BaseActivity;
 import com.simple.filmfactory.utils.FileSaveUtil;
+import com.simple.filmfactory.utils.WaterMarkSetting;
 
 import java.util.HashMap;
 
@@ -96,9 +97,11 @@ public class CameraSettingActivity extends BaseActivity {
                 //是否保存水印
                 if (cameraSets.isWaterOpen()) {
                     cameraSets.setWaterOpen(false);
+                    WaterMarkSetting.getInstant().setWaterMark(false);
                     settingBinding.watermarkStatus.setImageResource(R.drawable.chose_not);
                 } else {
                     cameraSets.setWaterOpen(true);
+                    WaterMarkSetting.getInstant().setWaterMark(true);
                     settingBinding.watermarkStatus.setImageResource(R.drawable.chose_yes);
                 }
                 FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);

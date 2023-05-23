@@ -34,6 +34,7 @@ import com.simple.filmfactory.utils.DisplayUtil;
 import com.simple.filmfactory.utils.FileSaveUtil;
 import com.simple.filmfactory.utils.FileUtil;
 import com.simple.filmfactory.utils.ImageUtil;
+import com.simple.filmfactory.utils.WaterMarkSetting;
 import com.simple.filmfactory.utils.WaterMarkUtil;
 import com.simple.filmfactory.utils.threadXUtil.AbstractLife;
 import com.simple.filmfactory.utils.threadXUtil.ThreadX;
@@ -160,6 +161,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
             cameraSets.setBackPictureWidth(720);
             cameraSets.setBackPictureWidth(720);
         }
+        WaterMarkSetting.getInstant().setWaterMark(cameraSets.isWaterOpen());
         initCameraView();
     }
 

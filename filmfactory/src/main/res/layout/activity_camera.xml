@@ -43,7 +43,7 @@
                 app:chose_color="#fff"
                 app:chose_size="6sp"
                 app:line_color="#f00"
-                app:line_width="6dp"
+                app:line_width="15dp"
                 app:unchose_color="#F3F3F3"
                 app:unchose_size="5sp" />
 
