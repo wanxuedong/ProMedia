@@ -200,7 +200,9 @@ public class CameraRender implements GLRender, SurfaceTexture.OnFrameAvailableLi
     @Override
     public void onDrawFrame() {
 
-        surfaceTexture.updateTexImage();
+        if (surfaceTexture != null){
+            surfaceTexture.updateTexImage();
+        }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClearColor(1f, 0f, 0f, 1f);
         GLES20.glViewport(0, 0, screenWidth, screenHeight);
@@ -244,6 +246,14 @@ public class CameraRender implements GLRender, SurfaceTexture.OnFrameAvailableLi
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
 
+    }
+
+    /**
+     * 清空画板
+     * **/
+    public void clearCanvas(){
+        // 设置清空颜色为黑色
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
 }

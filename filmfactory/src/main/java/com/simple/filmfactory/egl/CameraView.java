@@ -32,6 +32,11 @@ public class CameraView extends BaseEGLSurfaceView {
 
     private Surface surface;
 
+    /**
+     * 当前是否在拍照中
+     * **/
+    private boolean isTakePicture = true;
+
     public CameraView(Context context) {
         this(context, null);
     }
@@ -57,10 +62,6 @@ public class CameraView extends BaseEGLSurfaceView {
         super.onSizeChanged(w, h, oldw, oldh);
         //初始化宽高，保证选择的画面预览宽高与控件宽高比保持最接近
         wlCameraRender = new CameraRender(context);
-        baseCamera = new BaseCamera(context, getMeasuredWidth(), getMeasuredHeight());
-        setRender(wlCameraRender);
-        //调整预览角度
-        previewAngle(context);
         wlCameraRender.setOnSurfaceCreateListener(new OnSurfaceCreateListener() {
             @Override
             public void onSurfaceCreate(SurfaceTexture surfaceTexture, int tid) {
@@ -68,11 +69,19 @@ public class CameraView extends BaseEGLSurfaceView {
                 textureId = tid;
             }
         });
+        baseCamera = new BaseCamera(context, getMeasuredWidth(), getMeasuredHeight());
+        baseCamera.setTakePicture(isTakePicture);
+        setRender(wlCameraRender);
+        //调整预览角度
+        previewAngle(context);
         //如果需要录制的话，需要传入MediaCodec的surface
         setSurfaceAndEglContext(surface, null);
     }
 
     public void onDestroy() {
+        if (wlCameraRender != null){
+            wlCameraRender.clearCanvas();
+        }
         if (baseCamera != null) {
             baseCamera.stopPreview();
         }
@@ -93,11 +102,6 @@ public class CameraView extends BaseEGLSurfaceView {
                     super.run();
                     isBack = !isBack;
                     baseCamera.switchCamera();
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
 
                 @Override
@@ -107,6 +111,25 @@ public class CameraView extends BaseEGLSurfaceView {
                 }
             });
         }
+    }
+
+    /**
+     * 设置是否在拍照中
+     * @param takePicture 是否在拍照中，true：拍照，false：录像
+     * **/
+    public void setTakePicture(boolean takePicture) {
+        this.isTakePicture = takePicture;
+        if (baseCamera != null){
+            baseCamera.setTakePicture(takePicture);
+        }
+    }
+
+    /**
+     * 设置需要打开的摄像头
+     * @param isBack 是否是后置摄像头
+     * **/
+    public void setBack(boolean isBack) {
+        this.isBack = isBack;
     }
 
     /**

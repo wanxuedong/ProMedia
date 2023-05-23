@@ -8,11 +8,10 @@
         android:background="@color/black">
 
         <!--        相机预览界面-->
-        <com.simple.filmfactory.egl.CameraView
-            android:id="@+id/camera_view"
+        <RelativeLayout
+            android:id="@+id/preview_holder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"/>
+            android:layout_height="match_parent"/>
 
         <com.simple.filmfactory.widget.BaseHeadView
             android:id="@+id/base_head"

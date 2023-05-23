@@ -1,6 +1,8 @@
 package com.simple.filmfactory.egl.base;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -83,6 +85,7 @@ public abstract class BaseEGLSurfaceView extends SurfaceView implements SurfaceH
         }
     }
 
+    private SurfaceHolder holder;
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -90,6 +93,7 @@ public abstract class BaseEGLSurfaceView extends SurfaceView implements SurfaceH
         {
             surface = holder.getSurface();
         }
+        this.holder = holder;
         eglThread = new EGLThread(new WeakReference<BaseEGLSurfaceView>(this));
         eglThread.isCreate = true;
         eglThread.start();
@@ -111,6 +115,5 @@ public abstract class BaseEGLSurfaceView extends SurfaceView implements SurfaceH
         surface = null;
         eglContext = null;
     }
-
 
 }

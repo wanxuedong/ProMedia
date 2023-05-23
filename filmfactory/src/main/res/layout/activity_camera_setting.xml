@@ -27,7 +27,6 @@
             android:textSize="12sp" />
 
         <LinearLayout
-            android:id="@+id/change_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -49,15 +48,174 @@
                 android:textColor="@color/white"
                 android:textSize="15sp" />
 
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/white"
+            android:layout_marginTop="@dimen/dp_10"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="44dp"
+            android:layout_marginTop="@dimen/dp_10"
+            android:includeFontPadding="false"
+            android:text="后置摄像头"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/back_picture_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:orientation="horizontal">
+
             <TextView
-                android:id="@+id/power_size"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="拍照 "
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/back_picture_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
                 android:paddingLeft="20dp"
                 android:text="默认最高值 "
                 android:textColor="@color/littleGrey"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:alpha="0.4"
+                android:rotation="180"
+                android:src="@drawable/ic_chevron_left_white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/back_video_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="录像 "
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/back_video_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="默认最高值 "
+                android:textColor="@color/littleGrey"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:alpha="0.4"
+                android:rotation="180"
+                android:src="@drawable/ic_chevron_left_white" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/white"
+            android:layout_marginTop="@dimen/dp_10"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="44dp"
+            android:layout_marginTop="@dimen/dp_10"
+            android:includeFontPadding="false"
+            android:text="前置摄像头"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/front_picture_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="拍照 "
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/front_picture_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="默认最高值 "
+                android:textColor="@color/littleGrey"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:alpha="0.4"
+                android:rotation="180"
+                android:src="@drawable/ic_chevron_left_white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/front_video_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="录像 "
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/front_video_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:paddingLeft="20dp"
+                android:text="默认最高值 "
+                android:textColor="@color/littleGrey"
+                android:textSize="12sp" />
 
             <ImageView
                 android:layout_width="20dp"
@@ -71,7 +229,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="15dp">
@@ -102,7 +260,7 @@
 
         <VideoView
             android:layout_width="match_parent"
-            android:layout_height="5dp"
+            android:layout_height="6dp"
             android:layout_marginTop="30dp"
             android:background="@color/txtGrey" />
 

@@ -15,56 +15,73 @@ import java.util.List;
 public class CameraSets implements Serializable {
 
     /**
-     * 拍照或者录制的图片视频宽度(反面摄像头)
+     * 后置摄像头录制的视频宽度
      **/
-    private int previewWidth = 0;
+    private int backVideoWidth = 0;
     /**
-     * 拍照或者录制的图片视频高度(反面摄像头)
+     * 后置摄像头录制的视频高度
      **/
-    private int previewHeight = 0;
+    private int backVideoHeight = 0;
     /**
-     * 拍照或者录制的图片视频宽度(正面摄像头)
+     * 后置摄像头拍照图片宽度
      **/
-    private int selfieWidth = 0;
+    private int backPictureWidth = 0;
     /**
-     * 拍照或者录制的图片视频高度(正面摄像头)
+     * 后置摄像头拍照图片高度
      **/
-    private int selfieHeight = 0;
+    private int backPictureHeight = 0;
+
+    /**
+     * 后置摄像头录制的视频宽度
+     **/
+    private int frontVideoWidth = 0;
+    /**
+     * 后置摄像头录制的视频高度
+     **/
+    private int frontVideoHeight = 0;
+    /**
+     * 后置摄像头拍照图片宽度
+     **/
+    private int frontPictureWidth = 0;
+    /**
+     * 后置摄像头拍照图片高度
+     **/
+    private int frontPictureHeight = 0;
     /**
      * 是否启用自动水印功能
      **/
     private boolean waterOpen = true;
 
-    public int getPreviewWidth() {
-        if (previewWidth == 0){
+    public int getBackVideoWidth() {
+        if (backVideoWidth == 0){
             List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true,null);
             if (supportList != null && supportList.size() > 0){
-                previewWidth = supportList.get(supportList.size() - 1).width;
+                backVideoWidth = supportList.get(supportList.size() - 1).width;
             }else {
-                previewWidth = 0;
+                backVideoWidth = 0;
             }
         }
-        return previewWidth;
+        return backVideoWidth;
     }
 
-    public void setPreviewWidth(int previewWidth) {
-        this.previewWidth = previewWidth;
+    public void setBackVideoWidth(int backVideoWidth) {
+        this.backVideoWidth = backVideoWidth;
     }
 
-    public int getPreviewHeight() {
-        if (previewHeight == 0){
+    public int getBackVideoHeight() {
+        if (backVideoHeight == 0){
             List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true,null);
             if (supportList != null && supportList.size() > 0){
-                previewHeight = supportList.get(supportList.size() - 1).height;
+                backVideoHeight = supportList.get(supportList.size() - 1).height;
             }else {
-                previewHeight = 0;
+                backVideoHeight = 0;
             }
         }
-        return previewHeight;
+        return backVideoHeight;
     }
 
-    public void setPreviewHeight(int previewHeight) {
-        this.previewHeight = previewHeight;
+    public void setBackVideoHeight(int backVideoHeight) {
+        this.backVideoHeight = backVideoHeight;
     }
 
     public boolean isWaterOpen() {
@@ -75,41 +92,73 @@ public class CameraSets implements Serializable {
         this.waterOpen = waterOpen;
     }
 
-    public void setSelfieHeight(int selfieHeight) {
-        this.selfieHeight = selfieHeight;
+    public void setBackPictureHeight(int backPictureHeight) {
+        this.backPictureHeight = backPictureHeight;
     }
 
-    public void setSelfieWidth(int selfieWidth) {
-        this.selfieWidth = selfieWidth;
+    public void setBackPictureWidth(int backPictureWidth) {
+        this.backPictureWidth = backPictureWidth;
     }
 
-    public int getSelfieHeight() {
-        if (selfieHeight ==0){
+    public void setFrontPictureHeight(int frontPictureHeight) {
+        this.frontPictureHeight = frontPictureHeight;
+    }
+
+    public void setFrontPictureWidth(int frontPictureWidth) {
+        this.frontPictureWidth = frontPictureWidth;
+    }
+
+    public void setFrontVideoHeight(int frontVideoHeight) {
+        this.frontVideoHeight = frontVideoHeight;
+    }
+
+    public void setFrontVideoWidth(int frontVideoWidth) {
+        this.frontVideoWidth = frontVideoWidth;
+    }
+
+    public int getFrontPictureHeight() {
+        return frontPictureHeight;
+    }
+
+    public int getFrontPictureWidth() {
+        return frontPictureWidth;
+    }
+
+    public int getFrontVideoHeight() {
+        return frontVideoHeight;
+    }
+
+    public int getFrontVideoWidth() {
+        return frontVideoWidth;
+    }
+
+    public int getBackPictureHeight() {
+        if (backPictureHeight ==0){
             List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(false,null);
             if (supportList != null && supportList.size() > 0){
-                selfieHeight = supportList.get(supportList.size() - 1).height;
+                backPictureHeight = supportList.get(supportList.size() - 1).height;
             }else {
-                selfieHeight = 0;
+                backPictureHeight = 0;
             }
         }
-        return selfieHeight;
+        return backPictureHeight;
     }
 
-    public int getSelfieWidth() {
-        if (selfieWidth == 0){
+    public int getBackPictureWidth() {
+        if (backPictureWidth == 0){
             List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(false,null);
             if (supportList != null && supportList.size() > 0){
-                selfieWidth = supportList.get(supportList.size() - 1).width;
+                backPictureWidth = supportList.get(supportList.size() - 1).width;
             }else {
-                selfieWidth = 0;
+                backPictureWidth = 0;
             }
         }
-        return selfieWidth;
+        return backPictureWidth;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "previewWidth " + previewWidth + " : " + "previewHeight " + previewHeight + " : " + "selfieWidth " + selfieWidth + " : " + "selfieHeight " + selfieHeight + " : " + waterOpen;
+        return "previewWidth " + backVideoWidth + " : " + "previewHeight " + backVideoHeight + " : " + "selfieWidth " + backPictureWidth + " : " + "selfieHeight " + backPictureHeight + " : " + waterOpen;
     }
 }

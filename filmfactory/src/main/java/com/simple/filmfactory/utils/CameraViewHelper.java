@@ -1,6 +1,8 @@
 package com.simple.filmfactory.utils;
 
 import android.content.Context;
+import android.view.Gravity;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.simple.filmfactory.egl.CameraView;
@@ -43,6 +45,7 @@ public class CameraViewHelper {
             resultHeight = screenHeight;
         }
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) cameraView.getLayoutParams();
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
         params.width = resultWidth;
         params.height = resultHeight;
         cameraView.setLayoutParams(params);

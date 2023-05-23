@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -174,15 +175,16 @@ public class CameraDetecte {
     /**
      * 返回相机支持的图片尺寸,反面和正面支持的尺寸列表
      **/
-    private static List<Camera.Size> backSupportList;
-    private static List<Camera.Size> SupportList;
+    private static List<Camera.Size> backSupportList = new ArrayList<>();
+    private static List<Camera.Size> SupportList = new ArrayList<>();
 
     /**
      * 返回相机支持的图片尺寸
+     * @param isVideo 获取的是否是录像机数据，true：是，false：否
      **/
-    public static List<Camera.Size> getCameraSupportSize(boolean isBack, Camera.Parameters parameters) {
+    public static List<Camera.Size> getCameraSupportSize(boolean isVideo, Camera.Parameters parameters) {
         //获取支持的图片尺寸，由小到大
-        if (isBack) {
+        if (isVideo) {
             if (parameters != null) {
                 backSupportList = parameters.getSupportedPictureSizes();
             } else {
@@ -191,7 +193,7 @@ public class CameraDetecte {
             return backSupportList;
         } else {
             if (parameters != null) {
-                SupportList = parameters.getSupportedPictureSizes();
+                SupportList = parameters.getSupportedVideoSizes();
             } else {
                 return SupportList;
             }
@@ -200,11 +202,19 @@ public class CameraDetecte {
     }
 
     /**
+     * 返回相机支持的拍照或录像尺寸
+     **/
+    public static List<Camera.Size> getCameraSize(boolean isPicture, Camera.Parameters parameters) {
+        //获取支持的图片尺寸，由小到大
+        return isPicture ? parameters.getSupportedPictureSizes() : parameters.getSupportedVideoSizes();
+    }
+
+    /**
      * 返回相机支持的预览尺寸
      **/
-    public static List<Camera.Size> getCameraPreviewSize(Camera.Parameters parameters) {
+    public static List<Camera.Size> getCameraPreviewSize(boolean isBack,Camera.Parameters parameters) {
         //获取支持的拍照尺寸，由大到小
-        List<Camera.Size> list = parameters.getSupportedPreviewSizes();
+        List<Camera.Size> list = isBack ? parameters.getSupportedPreviewSizes() : parameters.getSupportedPreviewSizes();
         return list;
     }
 

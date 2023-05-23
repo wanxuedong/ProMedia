@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.adapter.CameraSizeAdapter;
 import com.simple.filmfactory.bean.SizeBean;
+import com.simple.filmfactory.constant.CameraConstant;
 import com.simple.filmfactory.databinding.ActivityCameraSizeBinding;
 import com.simple.filmfactory.ui.base.BaseActivity;
 import com.simple.filmfactory.utils.CallBack;
@@ -37,8 +38,19 @@ public class CameraSizeActivity extends BaseActivity implements CallBack {
     private List<SizeBean> sizeBeans = new ArrayList<>();
 
     /**
-     * 是否使用的是反面摄像头
+     * 是否是设置拍照，否则是录像
      **/
+    private boolean isPicture;
+
+    /**
+     * 上次选择的尺寸
+     * **/
+    private String[] selectSize = new String[2];
+
+
+    /**
+     * 当前是否是后置摄像头
+     * **/
     private boolean isBack;
 
     @Override
@@ -49,10 +61,17 @@ public class CameraSizeActivity extends BaseActivity implements CallBack {
     @Override
     public void initData() {
         super.initData();
-        isBack = "yes".endsWith(getIntent().getStringExtra("isBack")) ? true : false;
-        supportList = CameraDetecte.getCameraSupportSize(isBack, null);
+        isBack = CameraConstant.isBack;
+        isPicture = "picture".endsWith(getIntent().getStringExtra("sizeType")) ? true : false;
+        cameraSizeBinding.baseHead.setCenterTitle(isPicture ? "照片分辨率" : "录像分辨率");
+        selectSize = getIntent().getStringExtra("selectSize").split(":");
+        supportList = CameraDetecte.getCameraSize(isPicture, CameraConstant.camera.getParameters());
         for (int i = 0; i < supportList.size(); i++) {
-            sizeBeans.add(new SizeBean(supportList.get(i).width, supportList.get(i).height));
+            SizeBean sizeBean = new SizeBean(supportList.get(i).width, supportList.get(i).height);
+            if (supportList.get(i).width == Integer.parseInt(selectSize[1]) && supportList.get(i).height == Integer.parseInt(selectSize[0])){
+                sizeBean.setChose(true);
+            }
+            sizeBeans.add(sizeBean);
         }
         cameraSizeAdapter = new CameraSizeAdapter(sizeBeans);
         cameraSizeAdapter.setCallBack(this);

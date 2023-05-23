@@ -11,9 +11,7 @@ import androidx.annotation.NonNull;
 import com.simple.filmfactory.bean.CameraSets;
 import com.simple.filmfactory.utils.CameraDetecte;
 import com.simple.filmfactory.utils.FileSaveUtil;
-import com.simple.filmfactory.utils.logutils.LogUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -52,6 +50,8 @@ public class BaseCamera {
      **/
     private CameraSets cameraSets;
 
+    private boolean isTakePicture = true;
+
     public BaseCamera(Context context, int suggestWidth, int suggestHeight) {
         this.context = context;
         this.suggestWidth = suggestWidth;
@@ -76,18 +76,36 @@ public class BaseCamera {
     }
 
     /**
+     * 设置是否在拍照中
+     * @param takePicture 是否在拍照中，true：拍照，false：录像
+     * **/
+    public void setTakePicture(boolean takePicture) {
+        isTakePicture = takePicture;
+    }
+
+    /**
      * 切换摄像头,预览和图片的像素都使用了设备最高支持的分辨率
      **/
     public void switchCamera(boolean isBack) {
         try {
             cameraSets = (CameraSets) FileSaveUtil.readSerializable("camera_setting.txt");
             if (cameraSets != null) {
-                if (isBack) {
-                    appointWidth = cameraSets.getPreviewWidth();
-                    appointHeight = cameraSets.getPreviewHeight();
-                } else {
-                    appointWidth = cameraSets.getSelfieWidth();
-                    appointHeight = cameraSets.getSelfieHeight();
+                if (isTakePicture){
+                    if (isBack) {
+                        appointWidth = cameraSets.getBackPictureWidth();
+                        appointHeight = cameraSets.getBackPictureHeight();
+                    } else {
+                        appointWidth = cameraSets.getFrontPictureWidth();
+                        appointHeight = cameraSets.getFrontPictureHeight();
+                    }
+                }else {
+                    if (isBack) {
+                        appointWidth = cameraSets.getBackVideoWidth();
+                        appointHeight = cameraSets.getBackVideoHeight();
+                    } else {
+                        appointWidth = cameraSets.getFrontVideoWidth();
+                        appointHeight = cameraSets.getFrontVideoHeight();
+                    }
                 }
             }
             camera = openCamera(isBack);
@@ -107,7 +125,7 @@ public class BaseCamera {
             }
 
             //获取支持的预览尺寸，由大到小
-            List<Camera.Size> previewList = CameraDetecte.getCameraPreviewSize(parameters);
+            List<Camera.Size> previewList = CameraDetecte.getCameraPreviewSize(isBack,parameters);
             Camera.Size previewSize = getOptimalSize(previewList, suggestWidth, suggestHeight);
             //设置预览的宽高需要主要和预览的布局宽高比保持一致预览时画面才不会被拉伸，
             // 并且由于预览宽高只能摄像头支持的数据，所以这里传入的宽高是经过和控件的宽高比选择误差最小的数据
@@ -126,9 +144,11 @@ public class BaseCamera {
      * 停止预览
      **/
     public void stopPreview() {
-        cameraDetecte.stopAutoFocus();
+        if (cameraDetecte != null){
+            cameraDetecte.stopAutoFocus();
+        }
         if (camera != null) {
-            camera.startPreview();
+            camera.stopPreview();
             camera.release();
             camera = null;
         }
@@ -161,6 +181,10 @@ public class BaseCamera {
             }
         }
         return camera;
+    }
+
+    public boolean isBack() {
+        return isBack;
     }
 
     /**

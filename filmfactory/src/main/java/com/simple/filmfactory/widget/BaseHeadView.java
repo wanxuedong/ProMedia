@@ -105,6 +105,11 @@ public class BaseHeadView extends RelativeLayout {
         }
     }
 
+    public void setCenterTitle(String centerTitle) {
+        this.centerTitle = centerTitle;
+        SV.set((TextView) findViewById(R.id.center_title), centerTitle);
+    }
+
     public ImageView getLeftImageView() {
         return leftImageView;
     }

@@ -11,6 +11,8 @@ import io.realm.RealmConfiguration;
 
 public class FilmApplication extends Application implements CallBack<Application> {
 
+    private static Application application;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -19,6 +21,7 @@ public class FilmApplication extends Application implements CallBack<Application
 
     private void init() {
 
+        application = this;
         //初始化realm数据库
         Realm.init(this);
         //这时候会创建一个叫做 default.realm的Realm文件，一般来说，
@@ -32,6 +35,10 @@ public class FilmApplication extends Application implements CallBack<Application
 
         BaseUtil.setCallBack(this);
 
+    }
+
+    public static Application getApplication() {
+        return application;
     }
 
     @Override
