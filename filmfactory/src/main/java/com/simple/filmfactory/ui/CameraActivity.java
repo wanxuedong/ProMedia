@@ -22,6 +22,7 @@ import com.simple.filmfactory.R;
 import com.simple.filmfactory.bean.CameraSets;
 import com.simple.filmfactory.constant.CameraConstant;
 import com.simple.filmfactory.databinding.ActivityCameraBinding;
+import com.simple.filmfactory.egl.BaseCamera;
 import com.simple.filmfactory.egl.CameraView;
 import com.simple.filmfactory.encodec.MediaEnCodec;
 import com.simple.filmfactory.encodec.listener.OnMediaInfoListener;
@@ -132,11 +133,6 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
      **/
     int frontVideoHeight = 1280;
 
-    /**
-     * 是否开启了相机水印，默认不开启
-     **/
-    private boolean isWaterOpen;
-
     private CameraView cameraView;
 
     @Override
@@ -158,8 +154,6 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         cameraSets = (CameraSets) FileSaveUtil.readSerializable("camera_setting.txt");
         if (cameraSets == null){
             cameraSets = new CameraSets();
-            cameraSets.setBackPictureWidth(720);
-            cameraSets.setBackPictureWidth(720);
         }
         refreshWaterStatus();
         initCameraView();
@@ -186,8 +180,10 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         if (resultHeight > screenHeight) {
             resultHeight = screenHeight;
         }
-        params.width = resultWidth;
-        params.height = resultHeight;
+        if (resultWidth != 0 && resultHeight != 0){
+            params.width = resultWidth;
+            params.height = resultHeight;
+        }
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         cameraBinding.previewHolder.addView(cameraView, params);
     }
@@ -358,7 +354,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
      * 如果预览界面宽高比和选择拍摄的宽高比不一致，最后拍出照片或录像会形变
      **/
     private void refreshCameraView() {
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) cameraView.getLayoutParams();
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         int selectWidth = 0;
         int selectHeight = 0;
         if (cameraSets == null) {
@@ -372,8 +368,6 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         frontVideoHeight = cameraSets.getFrontVideoHeight();
         frontPictureWidth = cameraSets.getFrontPictureWidth();
         frontPictureHeight = cameraSets.getFrontPictureHeight();
-        //水印是否打开
-        isWaterOpen = cameraSets.isWaterOpen();
         if (isBack) {
             if (isTakePhoto) {
                 selectWidth = cameraSets.getBackPictureWidth();
@@ -399,8 +393,10 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         if (resultHeight > screenHeight) {
             resultHeight = screenHeight;
         }
-        params.width = resultWidth;
-        params.height = resultHeight;
+        if (resultWidth != 0 && resultHeight != 0){
+            params.width = resultWidth;
+            params.height = resultHeight;
+        }
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         cameraBinding.previewHolder.removeAllViews();
         //不及时释放资源，切换俩次前后摄像头就会卡死

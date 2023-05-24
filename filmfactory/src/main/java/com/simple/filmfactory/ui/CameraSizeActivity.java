@@ -65,6 +65,9 @@ public class CameraSizeActivity extends BaseActivity implements CallBack {
         isPicture = "picture".endsWith(getIntent().getStringExtra("sizeType")) ? true : false;
         cameraSizeBinding.baseHead.setCenterTitle(isPicture ? "照片分辨率" : "录像分辨率");
         selectSize = getIntent().getStringExtra("selectSize").split(":");
+        if (CameraConstant.camera == null){
+            return;
+        }
         supportList = CameraDetecte.getCameraSize(isPicture, CameraConstant.camera.getParameters());
         for (int i = 0; i < supportList.size(); i++) {
             SizeBean sizeBean = new SizeBean(supportList.get(i).width, supportList.get(i).height);

@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import androidx.annotation.NonNull;
 
 import com.simple.filmfactory.utils.CameraDetecte;
+import com.simple.filmfactory.utils.FileSaveUtil;
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,32 +56,32 @@ public class CameraSets implements Serializable {
     /**
      * 水印位置
      * 1:左上,2:左下,3:右上,4右下
-     * **/
+     **/
     private int waterPosition = 4;
 
     /**
      * 水印大小
      * 1:大,2:中,3:小
-     * **/
+     **/
     private int waterSize = 3;
 
     /**
      * 水印颜色
      * 1:黑,2:红,3:绿，4:白
-     * **/
+     **/
     private int waterColor = 4;
 
     /**
      * 水印内容
-     * **/
+     **/
     private String waterString = "";
 
     public int getBackVideoWidth() {
-        if (backVideoWidth == 0){
-            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true,null);
-            if (supportList != null && supportList.size() > 0){
-                backVideoWidth = supportList.get(supportList.size() - 1).width;
-            }else {
+        if (backVideoWidth == 0) {
+            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true, null);
+            if (supportList != null && supportList.size() > 0) {
+                backVideoWidth = supportList.get(supportList.size() / 2).width;
+            } else {
                 backVideoWidth = 0;
             }
         }
@@ -92,11 +93,11 @@ public class CameraSets implements Serializable {
     }
 
     public int getBackVideoHeight() {
-        if (backVideoHeight == 0){
-            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true,null);
-            if (supportList != null && supportList.size() > 0){
-                backVideoHeight = supportList.get(supportList.size() - 1).height;
-            }else {
+        if (backVideoHeight == 0) {
+            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true, null);
+            if (supportList != null && supportList.size() > 0) {
+                backVideoHeight = supportList.get(supportList.size() / 2).height;
+            } else {
                 backVideoHeight = 0;
             }
         }
@@ -188,11 +189,11 @@ public class CameraSets implements Serializable {
     }
 
     public int getBackPictureHeight() {
-        if (backPictureHeight ==0){
-            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(false,null);
-            if (supportList != null && supportList.size() > 0){
-                backPictureHeight = supportList.get(supportList.size() - 1).height;
-            }else {
+        if (backPictureHeight == 0) {
+            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(false, null);
+            if (supportList != null && supportList.size() > 0) {
+                backPictureHeight = supportList.get(supportList.size() / 2).height;
+            } else {
                 backPictureHeight = 0;
             }
         }
@@ -200,15 +201,42 @@ public class CameraSets implements Serializable {
     }
 
     public int getBackPictureWidth() {
-        if (backPictureWidth == 0){
-            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(false,null);
-            if (supportList != null && supportList.size() > 0){
-                backPictureWidth = supportList.get(supportList.size() - 1).width;
-            }else {
+        if (backPictureWidth == 0) {
+            List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(false, null);
+            if (supportList != null && supportList.size() > 0) {
+                backPictureWidth = supportList.get(supportList.size() / 2).width;
+            } else {
                 backPictureWidth = 0;
             }
         }
         return backPictureWidth;
+    }
+
+    public void initCameraSize(boolean isBack, Camera.Parameters parameters) {
+        if (isBack) {
+            List<Camera.Size> pictureList = CameraDetecte.getCameraSupportSize(false, parameters);
+            if (backPictureWidth == 0 && pictureList != null && pictureList.size() > 0) {
+                backPictureWidth = pictureList.get(pictureList.size() / 2).width;
+                backPictureHeight = pictureList.get(pictureList.size() / 2).height;
+            }
+            List<Camera.Size> videoList = CameraDetecte.getCameraSupportSize(true, parameters);
+            if (backVideoWidth == 0 && videoList != null && videoList.size() > 0) {
+                backVideoWidth = videoList.get(videoList.size() / 2).width;
+                backVideoHeight = videoList.get(videoList.size() / 2).height;
+            }
+        } else {
+            List<Camera.Size> pictureList = CameraDetecte.getCameraSupportSize(false, parameters);
+            if (frontPictureWidth == 0 && pictureList != null && pictureList.size() > 0) {
+                frontPictureWidth = pictureList.get(pictureList.size() / 2).width;
+                frontPictureHeight = pictureList.get(pictureList.size() / 2).height;
+            }
+            List<Camera.Size> videoList = CameraDetecte.getCameraSupportSize(true, parameters);
+            if (frontVideoWidth == 0 && videoList != null && videoList.size() > 0) {
+                frontVideoWidth = videoList.get(videoList.size() / 2).width;
+                frontVideoHeight = videoList.get(videoList.size() / 2).height;
+            }
+        }
+        FileSaveUtil.saveSerializable("camera_setting.txt", this);
     }
 
     @NonNull

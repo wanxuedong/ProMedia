@@ -77,8 +77,9 @@ public class BaseCamera {
 
     /**
      * 设置是否在拍照中
+     *
      * @param takePicture 是否在拍照中，true：拍照，false：录像
-     * **/
+     **/
     public void setTakePicture(boolean takePicture) {
         isTakePicture = takePicture;
     }
@@ -90,7 +91,7 @@ public class BaseCamera {
         try {
             cameraSets = (CameraSets) FileSaveUtil.readSerializable("camera_setting.txt");
             if (cameraSets != null) {
-                if (isTakePicture){
+                if (isTakePicture) {
                     if (isBack) {
                         appointWidth = cameraSets.getBackPictureWidth();
                         appointHeight = cameraSets.getBackPictureHeight();
@@ -98,7 +99,7 @@ public class BaseCamera {
                         appointWidth = cameraSets.getFrontPictureWidth();
                         appointHeight = cameraSets.getFrontPictureHeight();
                     }
-                }else {
+                } else {
                     if (isBack) {
                         appointWidth = cameraSets.getBackVideoWidth();
                         appointHeight = cameraSets.getBackVideoHeight();
@@ -109,23 +110,27 @@ public class BaseCamera {
                 }
             }
             camera = openCamera(isBack);
+            Camera.Parameters parameters = camera.getParameters();
             cameraDetecte = new CameraDetecte();
             camera.setPreviewTexture(surfaceTexture);
-            Camera.Parameters parameters = camera.getParameters();
 
             parameters.setFlashMode("off");
             parameters.setPreviewFormat(ImageFormat.NV21);
 
             //获取支持的图片尺寸，由小到大
-            List<Camera.Size> picList = CameraDetecte.getCameraSupportSize(isBack,parameters);
+            List<Camera.Size> picList = CameraDetecte.getCameraSupportSize(isBack, parameters);
             if (appointWidth == 0 || appointHeight == 0) {
-                parameters.setPictureSize(picList.get(picList.size() - 1).width, picList.get(picList.size() - 1).height);
+                if (cameraSets == null) {
+                    cameraSets = new CameraSets();
+                }
+                cameraSets.initCameraSize(isBack, parameters);
+                parameters.setPictureSize(picList.get(picList.size() / 2).width, picList.get(picList.size() / 2).height);
             } else {
                 parameters.setPictureSize(appointWidth, appointHeight);
             }
 
             //获取支持的预览尺寸，由大到小
-            List<Camera.Size> previewList = CameraDetecte.getCameraPreviewSize(isBack,parameters);
+            List<Camera.Size> previewList = CameraDetecte.getCameraPreviewSize(isBack, parameters);
             Camera.Size previewSize = getOptimalSize(previewList, suggestWidth, suggestHeight);
             //设置预览的宽高需要主要和预览的布局宽高比保持一致预览时画面才不会被拉伸，
             // 并且由于预览宽高只能摄像头支持的数据，所以这里传入的宽高是经过和控件的宽高比选择误差最小的数据
@@ -140,11 +145,15 @@ public class BaseCamera {
         }
     }
 
+    public interface CameraParameter {
+        void parameter(boolean isBack, Camera.Parameters parameters);
+    }
+
     /**
      * 停止预览
      **/
     public void stopPreview() {
-        if (cameraDetecte != null){
+        if (cameraDetecte != null) {
             cameraDetecte.stopAutoFocus();
         }
         if (camera != null) {

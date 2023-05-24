@@ -78,6 +78,13 @@ public class CameraView extends BaseEGLSurfaceView {
         setSurfaceAndEglContext(surface, null);
     }
 
+
+    private BaseCamera.CameraParameter cameraParameter;
+
+    public void setCameraParameter(BaseCamera.CameraParameter cameraParameter) {
+        this.cameraParameter = cameraParameter;
+    }
+
     public void onDestroy() {
         if (wlCameraRender != null){
             wlCameraRender.clearCanvas();
