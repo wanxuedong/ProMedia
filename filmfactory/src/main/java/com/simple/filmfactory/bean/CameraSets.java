@@ -65,6 +65,12 @@ public class CameraSets implements Serializable {
     private int waterSize = 3;
 
     /**
+     * 水印颜色
+     * 1:黑,2:红,3:绿，4:白
+     * **/
+    private int waterColor = 4;
+
+    /**
      * 水印内容
      * **/
     private String waterString = "";
@@ -171,6 +177,14 @@ public class CameraSets implements Serializable {
 
     public String getWaterString() {
         return waterString;
+    }
+
+    public void setWaterColor(int waterColor) {
+        this.waterColor = waterColor;
+    }
+
+    public int getWaterColor() {
+        return waterColor;
     }
 
     public int getBackPictureHeight() {

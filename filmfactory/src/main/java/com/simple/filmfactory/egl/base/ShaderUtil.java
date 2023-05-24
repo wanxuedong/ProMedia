@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.opengl.GLES20;
 import android.util.Log;
@@ -99,6 +100,20 @@ public class ShaderUtil {
         canvas.drawColor(Color.parseColor(bgColor));
         canvas.drawText(text, padding, -top + padding, paint);
         return bm;
+    }
+
+    /**
+     * 获取文字高宽比例
+     * @param text 文字内容
+     * **/
+    public static float getTextProportion(String text){
+        Paint paint = new Paint();
+        paint.setTextSize(30);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        int width = bounds.width();
+        int height = bounds.height();
+        return 1f * height / width;
     }
 
     public static int loadBitmapTexture(Bitmap bitmap) {

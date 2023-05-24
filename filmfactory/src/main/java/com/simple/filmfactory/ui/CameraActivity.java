@@ -169,6 +169,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         WaterMarkSetting.getInstant().setWaterMark(cameraSets.isWaterOpen());
         WaterMarkSetting.getInstant().setWaterPosition(cameraSets.getWaterPosition());
         WaterMarkSetting.getInstant().setWaterSize(cameraSets.getWaterSize());
+        WaterMarkSetting.getInstant().setWaterColor(cameraSets.getWaterColor());
         WaterMarkSetting.getInstant().setWaterString(cameraSets.getWaterString());
     }
 
@@ -270,8 +271,8 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
                                             //图片添加水印
                                             Bitmap bitmap = ImageUtil.rotateBitmap(ImageUtil.Bytes2Bitmap(data), isBack ? 90 : -90);
                                             Bitmap waterMap = BitmapFactory.decodeResource(getResources(), R.mipmap.dipian, null);
-                                            if (isWaterOpen) {
-                                                bitmap = WaterMarkUtil.addWater(CameraActivity.this, bitmap, waterMap, "内涵段子tv", Gravity.RIGHT | Gravity.BOTTOM);
+                                            if (WaterMarkSetting.getInstant().isWaterMark()) {
+                                                bitmap = WaterMarkUtil.addWater(CameraActivity.this, bitmap, waterMap, WaterMarkSetting.getInstant().getWaterString(), WaterMarkSetting.getInstant().getWaterGravity());
                                             }
                                             final Bitmap finalBitmap = bitmap;
                                             runOnUiThread(new Runnable() {

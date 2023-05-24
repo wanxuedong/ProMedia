@@ -284,13 +284,13 @@
             <EditText
                 android:id="@+id/water_txt"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
                 android:gravity="right"
                 android:hint="请输入水印内容"
                 android:includeFontPadding="false"
-                android:maxLength="15"
+                android:maxLength="10"
                 android:maxLines="1"
                 android:paddingVertical="10dp"
                 android:text="镶100来颗钻"
@@ -444,6 +444,85 @@
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="4dp"
                 android:text="右下"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="44dp"
+            android:includeFontPadding="false"
+            android:text="水印颜色"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="44dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/water_color_one"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/unselect_bg"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="4dp"
+                android:text="黑"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/water_color_two"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/unselect_bg"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="4dp"
+                android:text="红"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/water_color_three"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/unselect_bg"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="4dp"
+                android:text="绿"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/water_color_for"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/select_bg"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="4dp"
+                android:text="白"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
 

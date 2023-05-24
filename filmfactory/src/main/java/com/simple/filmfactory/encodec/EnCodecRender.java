@@ -3,11 +3,14 @@ package com.simple.filmfactory.encodec;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.os.Build;
+import android.text.TextUtils;
 
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.egl.base.BaseEGLSurfaceView;
 import com.simple.filmfactory.egl.base.ShaderUtil;
 import com.simple.filmfactory.egl.listener.GLRender;
+import com.simple.filmfactory.utils.WaterMarkSetting;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -56,24 +59,7 @@ public class EnCodecRender implements GLRender {
     public EnCodecRender(Context context, int textureid) {
         this.context = context;
         this.textureid = textureid;
-
-        bitmap = ShaderUtil.createTextImage(context,"内涵段子tv", 50, "#ff0000", "#00000000", 0);
-
-        float r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
-        float w = r * 0.1f;
-
-        vertexData[8] = 0.8f - w;
-        vertexData[9] = -0.8f;
-
-        vertexData[10] = 0.8f;
-        vertexData[11] = -0.8f;
-
-        vertexData[12] = 0.8f - w;
-        vertexData[13] = -0.7f;
-
-        vertexData[14] = 0.8f;
-        vertexData[15] = -0.7f;
-
+        initWaterMark();
         vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer()
@@ -86,6 +72,83 @@ public class EnCodecRender implements GLRender {
                 .put(fragmentData);
         fragmentBuffer.position(0);
 
+    }
+
+    /**
+     * 初始化摄像头预览页面水印配置
+     * **/
+    private void initWaterMark() {
+        String waterString = WaterMarkSetting.getInstant().getWaterString();
+        String waterColor = WaterMarkSetting.getInstant().getWaterColor();
+        if (WaterMarkSetting.getInstant().isWaterMark()) {
+            bitmap = ShaderUtil.createTextImage(context, waterString, 40, waterColor, "#00000000", 0);
+            //获取宽高比
+            float proportion = ShaderUtil.getTextProportion(waterString);
+            //x轴绘制距离边界偏移距离,默认不变
+            final float offset = 0.1f;
+            //需要绘制的x轴上的距离大小,范围0.1f-0.9f
+            float drawX = WaterMarkSetting.getInstant().getWaterSize() * waterString.length();
+            float drawY = drawX * proportion;
+            switch (WaterMarkSetting.getInstant().getWaterPosition()) {
+                case 1:
+                    //左上
+                    vertexData[8] = -(1f - offset) - drawX;
+                    vertexData[9] = (1f - offset);
+
+                    vertexData[10] = -(1f - offset);
+                    vertexData[11] = (1f - offset);
+
+                    vertexData[12] = -(1f - offset) - drawX;
+                    vertexData[13] = (1f - offset - drawY);
+
+                    vertexData[14] = -(1f - offset);
+                    vertexData[15] = (1f - offset - drawY);
+                    break;
+                case 2:
+                    //左下
+                    vertexData[8] = -(1f - offset) - drawX;
+                    vertexData[9] = -(1f - offset);
+
+                    vertexData[10] = -(1f - offset);
+                    vertexData[11] = -(1f - offset);
+
+                    vertexData[12] = -(1f - offset) - drawX;
+                    vertexData[13] = -(1f - offset - drawY);
+
+                    vertexData[14] = -(1f - offset);
+                    vertexData[15] = -(1f - offset - drawY);
+                    break;
+                case 3:
+                    //右上
+                    vertexData[8] = (1f - offset) - drawX;
+                    vertexData[9] = (1f - offset);
+
+                    vertexData[10] = (1f - offset);
+                    vertexData[11] = (1f - offset);
+
+                    vertexData[12] = (1f - offset) - drawX;
+                    vertexData[13] = (1f - offset - drawY);
+
+                    vertexData[14] = (1f - offset);
+                    vertexData[15] = (1f - offset - drawY);
+                    break;
+                case 4:
+                    //右下
+                    vertexData[8] = (1f - offset) - drawX;
+                    vertexData[9] = -(1f - offset);
+
+                    vertexData[10] = (1f - offset);
+                    vertexData[11] = -(1f - offset);
+
+                    vertexData[12] = (1f - offset) - drawX;
+                    vertexData[13] = -(1f - offset - drawY);
+
+                    vertexData[14] = (1f - offset);
+                    vertexData[15] = -(1f - offset - drawY);
+                    break;
+                default:
+            }
+        }
     }
 
     @Override

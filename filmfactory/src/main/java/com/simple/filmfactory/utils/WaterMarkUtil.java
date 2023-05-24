@@ -46,7 +46,6 @@ public class WaterMarkUtil {
         if (watermark != null) {
             int ww = watermark.getWidth();
             int wh = watermark.getHeight();
-            paint.setAlpha(50);
             // 在src的左下角画入水印
             cv.drawBitmap(watermark, margin, h - wh - margin, paint);
         }
@@ -55,9 +54,8 @@ public class WaterMarkUtil {
             //设置水印字体
             Typeface font = Typeface.createFromAsset(context.getAssets(), "fonts/华文新魏.ttf");
             TextPaint textPaint = new TextPaint();
-            textPaint.setColor(Color.WHITE);
+            textPaint.setColor(WaterMarkSetting.getInstant().getWaterIntColor());
             textPaint.setTypeface(font);
-            textPaint.setAlpha(50);
             textPaint.setTextSize(textHeight);
             int left = 0;
             int top = 0;

@@ -3,6 +3,7 @@ package com.simple.filmfactory.egl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.simple.filmfactory.R;
@@ -61,77 +62,7 @@ public class CameraFboRender {
 
     public CameraFboRender(Context context) {
         this.context = context;
-
-        String waterString = WaterMarkSetting.getInstant().getWaterString();
-        int waterSize = WaterMarkSetting.getInstant().getWaterSize();
-        int waterPosition = WaterMarkSetting.getInstant().getWaterPosition();
-        float r = 0;
-        float w = 0;
-        if (!TextUtils.isEmpty(waterString)){
-            bitmap = ShaderUtil.createTextImage(context, WaterMarkSetting.getInstant().getWaterString(), waterSize, "#ffffff", "#00000000", 0);
-            r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
-            w = r * 0.1f;
-        }
-        switch (waterPosition){
-            case 1:
-                //左上
-                vertexData[8] = -0.8f - w;
-                vertexData[9] = 0.8f;
-
-                vertexData[10] = -0.8f;
-                vertexData[11] = 0.8f;
-
-                vertexData[12] = -0.8f - w;
-                vertexData[13] = 0.7f;
-
-                vertexData[14] = -0.8f;
-                vertexData[15] = 0.7f;
-                break;
-            case 2:
-                //左下
-                vertexData[8] = -0.8f - w;
-                vertexData[9] = -0.8f;
-
-                vertexData[10] = -0.8f;
-                vertexData[11] = -0.8f;
-
-                vertexData[12] = -0.8f - w;
-                vertexData[13] = -0.7f;
-
-                vertexData[14] = -0.8f;
-                vertexData[15] = -0.7f;
-                break;
-            case 3:
-                //右上
-                vertexData[8] = 0.8f - w;
-                vertexData[9] = 0.8f;
-
-                vertexData[10] = 0.8f;
-                vertexData[11] = 0.8f;
-
-                vertexData[12] = 0.8f - w;
-                vertexData[13] = 0.7f;
-
-                vertexData[14] = 0.8f;
-                vertexData[15] = 0.7f;
-                break;
-            case 4:
-                //右下
-                vertexData[8] = 0.8f - w;
-                vertexData[9] = -0.8f;
-
-                vertexData[10] = 0.8f;
-                vertexData[11] = -0.8f;
-
-                vertexData[12] = 0.8f - w;
-                vertexData[13] = -0.7f;
-
-                vertexData[14] = 0.8f;
-                vertexData[15] = -0.7f;
-                break;
-            default:
-        }
-
+        initWaterMark();
         vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer()
@@ -144,6 +75,83 @@ public class CameraFboRender {
                 .put(fragmentData);
         fragmentBuffer.position(0);
 
+    }
+
+    /**
+     * 初始化摄像头预览页面水印配置
+     * **/
+    private void initWaterMark() {
+        String waterString = WaterMarkSetting.getInstant().getWaterString();
+        String waterColor = WaterMarkSetting.getInstant().getWaterColor();
+        if (WaterMarkSetting.getInstant().isWaterMark()) {
+            bitmap = ShaderUtil.createTextImage(context, waterString, 40, waterColor, "#00000000", 0);
+            //获取宽高比
+            float proportion = ShaderUtil.getTextProportion(waterString);
+            //x轴绘制距离边界偏移距离,默认不变
+            final float offset = 0.1f;
+            //需要绘制的x轴上的距离大小,范围0.1f-0.9f
+            float drawX = WaterMarkSetting.getInstant().getWaterSize() * waterString.length();
+            float drawY = drawX * proportion;
+            switch (WaterMarkSetting.getInstant().getWaterPosition()) {
+                case 1:
+                    //左上
+                    vertexData[8] = -(1f - offset) - drawX;
+                    vertexData[9] = (1f - offset);
+
+                    vertexData[10] = -(1f - offset);
+                    vertexData[11] = (1f - offset);
+
+                    vertexData[12] = -(1f - offset) - drawX;
+                    vertexData[13] = (1f - offset - drawY);
+
+                    vertexData[14] = -(1f - offset);
+                    vertexData[15] = (1f - offset - drawY);
+                    break;
+                case 2:
+                    //左下
+                    vertexData[8] = -(1f - offset) - drawX;
+                    vertexData[9] = -(1f - offset);
+
+                    vertexData[10] = -(1f - offset);
+                    vertexData[11] = -(1f - offset);
+
+                    vertexData[12] = -(1f - offset) - drawX;
+                    vertexData[13] = -(1f - offset - drawY);
+
+                    vertexData[14] = -(1f - offset);
+                    vertexData[15] = -(1f - offset - drawY);
+                    break;
+                case 3:
+                    //右上
+                    vertexData[8] = (1f - offset) - drawX;
+                    vertexData[9] = (1f - offset);
+
+                    vertexData[10] = (1f - offset);
+                    vertexData[11] = (1f - offset);
+
+                    vertexData[12] = (1f - offset) - drawX;
+                    vertexData[13] = (1f - offset - drawY);
+
+                    vertexData[14] = (1f - offset);
+                    vertexData[15] = (1f - offset - drawY);
+                    break;
+                case 4:
+                    //右下
+                    vertexData[8] = (1f - offset) - drawX;
+                    vertexData[9] = -(1f - offset);
+
+                    vertexData[10] = (1f - offset);
+                    vertexData[11] = -(1f - offset);
+
+                    vertexData[12] = (1f - offset) - drawX;
+                    vertexData[13] = -(1f - offset - drawY);
+
+                    vertexData[14] = (1f - offset);
+                    vertexData[15] = -(1f - offset - drawY);
+                    break;
+                default:
+            }
+        }
     }
 
     public void onCreate() {
@@ -173,7 +181,7 @@ public class CameraFboRender {
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, fragmentData.length * 4, fragmentBuffer);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-        if (bitmap != null){
+        if (bitmap != null) {
             bitmapTextureid = ShaderUtil.loadBitmapTexture(bitmap);
         }
     }
@@ -218,7 +226,7 @@ public class CameraFboRender {
 
 
         //绘制bitmap水印
-        if (WaterMarkSetting.getInstant().isWaterMark()){
+        if (WaterMarkSetting.getInstant().isWaterMark()) {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, bitmapTextureid);
             GLES20.glEnableVertexAttribArray(vPosition);
             //这里的32指的是使用后面的4个顶点坐标来绘制水印

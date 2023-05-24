@@ -49,6 +49,7 @@ public class CameraSettingActivity extends BaseActivity {
         settingBinding.waterTxt.setText(cameraSets.getWaterString());
         selectWaterPosition(cameraSets.getWaterPosition());
         selectWaterSize(cameraSets.getWaterSize());
+        selectWaterColor(cameraSets.getWaterColor());
         settingBinding.backPictureSize.setText(cameraSets.getBackPictureHeight() + " x " + cameraSets.getBackPictureWidth());
         settingBinding.backVideoSize.setText(cameraSets.getBackVideoHeight() + " x " + cameraSets.getBackVideoWidth());
         settingBinding.frontPictureSize.setText(cameraSets.getFrontPictureHeight() + " x " + cameraSets.getFrontPictureWidth());
@@ -88,6 +89,10 @@ public class CameraSettingActivity extends BaseActivity {
         settingBinding.waterSizeOne.setOnClickListener(this);
         settingBinding.waterSizeTwo.setOnClickListener(this);
         settingBinding.waterSizeThree.setOnClickListener(this);
+        settingBinding.waterColorOne.setOnClickListener(this);
+        settingBinding.waterColorTwo.setOnClickListener(this);
+        settingBinding.waterColorThree.setOnClickListener(this);
+        settingBinding.waterColorFor.setOnClickListener(this);
     }
 
     @Override
@@ -156,6 +161,18 @@ public class CameraSettingActivity extends BaseActivity {
             case R.id.water_position_for:
                 selectWaterPosition(4);
                 break;
+            case R.id.water_color_one:
+                selectWaterColor(1);
+                break;
+            case R.id.water_color_two:
+                selectWaterColor(2);
+                break;
+            case R.id.water_color_three:
+                selectWaterColor(3);
+                break;
+            case R.id.water_color_for:
+                selectWaterColor(4);
+                break;
             default:
         }
     }
@@ -210,6 +227,34 @@ public class CameraSettingActivity extends BaseActivity {
         settingBinding.waterSizeOne.setBackgroundResource(R.drawable.unselect_bg);
         settingBinding.waterSizeTwo.setBackgroundResource(R.drawable.unselect_bg);
         settingBinding.waterSizeThree.setBackgroundResource(R.drawable.unselect_bg);
+    }
+
+    private void selectWaterColor(int position){
+        resetWaterColor();
+        switch (position){
+            case 1:
+                settingBinding.waterColorOne.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 2:
+                settingBinding.waterColorTwo.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 3:
+                settingBinding.waterColorThree.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 4:
+                settingBinding.waterColorFor.setBackgroundResource(R.drawable.select_bg);
+                break;
+            default:
+        }
+        cameraSets.setWaterColor(position);
+        FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);
+    }
+
+    private void resetWaterColor() {
+        settingBinding.waterColorOne.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterColorTwo.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterColorThree.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterColorFor.setBackgroundResource(R.drawable.unselect_bg);
     }
 
     /**
