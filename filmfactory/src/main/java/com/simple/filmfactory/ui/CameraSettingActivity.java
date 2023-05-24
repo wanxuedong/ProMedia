@@ -1,6 +1,8 @@
 package com.simple.filmfactory.ui;
 
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import androidx.databinding.DataBindingUtil;
 
@@ -44,6 +46,9 @@ public class CameraSettingActivity extends BaseActivity {
         } else {
             settingBinding.watermarkStatus.setImageResource(R.drawable.chose_not);
         }
+        settingBinding.waterTxt.setText(cameraSets.getWaterString());
+        selectWaterPosition(cameraSets.getWaterPosition());
+        selectWaterSize(cameraSets.getWaterSize());
         settingBinding.backPictureSize.setText(cameraSets.getBackPictureHeight() + " x " + cameraSets.getBackPictureWidth());
         settingBinding.backVideoSize.setText(cameraSets.getBackVideoHeight() + " x " + cameraSets.getBackVideoWidth());
         settingBinding.frontPictureSize.setText(cameraSets.getFrontPictureHeight() + " x " + cameraSets.getFrontPictureWidth());
@@ -59,6 +64,30 @@ public class CameraSettingActivity extends BaseActivity {
         settingBinding.frontPictureHolder.setOnClickListener(this);
         settingBinding.frontVideoHolder.setOnClickListener(this);
         settingBinding.watermarkStatus.setOnClickListener(this);
+        settingBinding.waterTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                cameraSets.setWaterString(settingBinding.waterTxt.getText().toString().trim());
+                FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);
+            }
+        });
+        settingBinding.waterPositionOne.setOnClickListener(this);
+        settingBinding.waterPositionTwo.setOnClickListener(this);
+        settingBinding.waterPositionThree.setOnClickListener(this);
+        settingBinding.waterPositionFor.setOnClickListener(this);
+        settingBinding.waterSizeOne.setOnClickListener(this);
+        settingBinding.waterSizeTwo.setOnClickListener(this);
+        settingBinding.waterSizeThree.setOnClickListener(this);
     }
 
     @Override
@@ -106,8 +135,81 @@ public class CameraSettingActivity extends BaseActivity {
                 }
                 FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);
                 break;
+            case R.id.water_size_one:
+                selectWaterSize(1);
+                break;
+            case R.id.water_size_two:
+                selectWaterSize(2);
+                break;
+            case R.id.water_size_three:
+                selectWaterSize(3);
+                break;
+            case R.id.water_position_one:
+                selectWaterPosition(1);
+                break;
+            case R.id.water_position_two:
+                selectWaterPosition(2);
+                break;
+            case R.id.water_position_three:
+                selectWaterPosition(3);
+                break;
+            case R.id.water_position_for:
+                selectWaterPosition(4);
+                break;
             default:
         }
+    }
+
+    private void selectWaterPosition(int position){
+        resetWaterPosition();
+        switch (position){
+            case 1:
+                settingBinding.waterPositionOne.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 2:
+                settingBinding.waterPositionTwo.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 3:
+                settingBinding.waterPositionThree.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 4:
+                settingBinding.waterPositionFor.setBackgroundResource(R.drawable.select_bg);
+                break;
+            default:
+        }
+        cameraSets.setWaterPosition(position);
+        FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);
+    }
+
+    private void resetWaterPosition() {
+        settingBinding.waterPositionOne.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterPositionTwo.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterPositionThree.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterPositionFor.setBackgroundResource(R.drawable.unselect_bg);
+    }
+
+    private void selectWaterSize(int size){
+        resetWaterSize();
+        switch (size){
+            case 1:
+                settingBinding.waterSizeOne.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 2:
+                settingBinding.waterSizeTwo.setBackgroundResource(R.drawable.select_bg);
+                break;
+            case 3:
+                settingBinding.waterSizeThree.setBackgroundResource(R.drawable.select_bg);
+                break;
+            default:
+        }
+        cameraSets.setWaterSize(size);
+        FileSaveUtil.saveSerializable("camera_setting.txt", cameraSets);
+    }
+
+    private void resetWaterSize() {
+        settingBinding.waterSizeOne.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterSizeTwo.setBackgroundResource(R.drawable.unselect_bg);
+        settingBinding.waterSizeThree.setBackgroundResource(R.drawable.unselect_bg);
     }
 
     /**

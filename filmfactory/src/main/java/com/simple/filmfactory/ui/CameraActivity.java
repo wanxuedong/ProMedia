@@ -161,8 +161,15 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
             cameraSets.setBackPictureWidth(720);
             cameraSets.setBackPictureWidth(720);
         }
-        WaterMarkSetting.getInstant().setWaterMark(cameraSets.isWaterOpen());
+        refreshWaterStatus();
         initCameraView();
+    }
+
+    private void refreshWaterStatus(){
+        WaterMarkSetting.getInstant().setWaterMark(cameraSets.isWaterOpen());
+        WaterMarkSetting.getInstant().setWaterPosition(cameraSets.getWaterPosition());
+        WaterMarkSetting.getInstant().setWaterSize(cameraSets.getWaterSize());
+        WaterMarkSetting.getInstant().setWaterString(cameraSets.getWaterString());
     }
 
     private void initCameraView() {
@@ -416,6 +423,7 @@ public class CameraActivity extends BaseActivity implements GateView.OnNavigateL
         if (requestCode == 10000) {
             cameraSets = (CameraSets) FileSaveUtil.readSerializable("camera_setting.txt");
             refreshCameraView();
+            refreshWaterStatus();
         }
     }
 

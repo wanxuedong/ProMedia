@@ -3,6 +3,7 @@ package com.simple.filmfactory.egl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.text.TextUtils;
 
 import com.simple.filmfactory.R;
 import com.simple.filmfactory.egl.base.ShaderUtil;
@@ -61,23 +62,75 @@ public class CameraFboRender {
     public CameraFboRender(Context context) {
         this.context = context;
 
-        bitmap = ShaderUtil.createTextImage(context, "内涵段子tv", 50, "#ff0000", "#00000000", 0);
+        String waterString = WaterMarkSetting.getInstant().getWaterString();
+        int waterSize = WaterMarkSetting.getInstant().getWaterSize();
+        int waterPosition = WaterMarkSetting.getInstant().getWaterPosition();
+        float r = 0;
+        float w = 0;
+        if (!TextUtils.isEmpty(waterString)){
+            bitmap = ShaderUtil.createTextImage(context, WaterMarkSetting.getInstant().getWaterString(), waterSize, "#ffffff", "#00000000", 0);
+            r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
+            w = r * 0.1f;
+        }
+        switch (waterPosition){
+            case 1:
+                //左上
+                vertexData[8] = -0.8f - w;
+                vertexData[9] = 0.8f;
 
+                vertexData[10] = -0.8f;
+                vertexData[11] = 0.8f;
 
-        float r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
-        float w = r * 0.1f;
+                vertexData[12] = -0.8f - w;
+                vertexData[13] = 0.7f;
 
-        vertexData[8] = 0.8f - w;
-        vertexData[9] = -0.8f;
+                vertexData[14] = -0.8f;
+                vertexData[15] = 0.7f;
+                break;
+            case 2:
+                //左下
+                vertexData[8] = -0.8f - w;
+                vertexData[9] = -0.8f;
 
-        vertexData[10] = 0.8f;
-        vertexData[11] = -0.8f;
+                vertexData[10] = -0.8f;
+                vertexData[11] = -0.8f;
 
-        vertexData[12] = 0.8f - w;
-        vertexData[13] = -0.7f;
+                vertexData[12] = -0.8f - w;
+                vertexData[13] = -0.7f;
 
-        vertexData[14] = 0.8f;
-        vertexData[15] = -0.7f;
+                vertexData[14] = -0.8f;
+                vertexData[15] = -0.7f;
+                break;
+            case 3:
+                //右上
+                vertexData[8] = 0.8f - w;
+                vertexData[9] = 0.8f;
+
+                vertexData[10] = 0.8f;
+                vertexData[11] = 0.8f;
+
+                vertexData[12] = 0.8f - w;
+                vertexData[13] = 0.7f;
+
+                vertexData[14] = 0.8f;
+                vertexData[15] = 0.7f;
+                break;
+            case 4:
+                //右下
+                vertexData[8] = 0.8f - w;
+                vertexData[9] = -0.8f;
+
+                vertexData[10] = 0.8f;
+                vertexData[11] = -0.8f;
+
+                vertexData[12] = 0.8f - w;
+                vertexData[13] = -0.7f;
+
+                vertexData[14] = 0.8f;
+                vertexData[15] = -0.7f;
+                break;
+            default:
+        }
 
         vertexBuffer = ByteBuffer.allocateDirect(vertexData.length * 4)
                 .order(ByteOrder.nativeOrder())
@@ -120,7 +173,9 @@ public class CameraFboRender {
         GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, fragmentData.length * 4, fragmentBuffer);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-        bitmapTextureid = ShaderUtil.loadBitmapTexture(bitmap);
+        if (bitmap != null){
+            bitmapTextureid = ShaderUtil.loadBitmapTexture(bitmap);
+        }
     }
 
     private int width;

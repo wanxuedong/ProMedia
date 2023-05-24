@@ -52,6 +52,23 @@ public class CameraSets implements Serializable {
      **/
     private boolean waterOpen = true;
 
+    /**
+     * 水印位置
+     * 1:左上,2:左下,3:右上,4右下
+     * **/
+    private int waterPosition = 4;
+
+    /**
+     * 水印大小
+     * 1:大,2:中,3:小
+     * **/
+    private int waterSize = 3;
+
+    /**
+     * 水印内容
+     * **/
+    private String waterString = "";
+
     public int getBackVideoWidth() {
         if (backVideoWidth == 0){
             List<Camera.Size> supportList = CameraDetecte.getCameraSupportSize(true,null);
@@ -130,6 +147,30 @@ public class CameraSets implements Serializable {
 
     public int getFrontVideoWidth() {
         return frontVideoWidth;
+    }
+
+    public void setWaterPosition(int waterPosition) {
+        this.waterPosition = waterPosition;
+    }
+
+    public int getWaterPosition() {
+        return waterPosition;
+    }
+
+    public void setWaterSize(int waterSize) {
+        this.waterSize = waterSize;
+    }
+
+    public int getWaterSize() {
+        return waterSize;
+    }
+
+    public void setWaterString(String waterString) {
+        this.waterString = waterString;
+    }
+
+    public String getWaterString() {
+        return waterString;
     }
 
     public int getBackPictureHeight() {
